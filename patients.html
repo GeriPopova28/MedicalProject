@@ -1,0 +1,66 @@
+{% extends 'base_doctor.html' %}
+
+{% block title %}Пациенти - MED-AI{% endblock %}
+
+{% block content %}
+<div class="patients-page-container">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 5px;">👥 Регистър на пациентите</h1>
+            <p style="color: #94a3b8; font-size: 14px;">Управление на дигитални медицински досиета и история на заболяванията.</p>
+        </div>
+        
+        <a href="/doctor/patients/add" style="background: #2563eb; color: white; text-decoration: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+            ➕ Нов Пациент
+        </a>
+    </div>
+
+    <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px);">
+        
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+            <thead>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8;">
+                    <th style="padding: 14px 10px;">ID</th>
+                    <th style="padding: 14px 10px;">Име на пациента</th>
+                    <th style="padding: 14px 10px;">ЕГН</th>
+                    <th style="padding: 14px 10px;">Последен преглед</th>
+                    <th style="padding: 14px 10px;">AI Статус</th>
+                    <th style="padding: 14px 10px; text-align: right;">Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                    <td style="padding: 16px 10px; color: #60a5fa; font-weight: 600;">#{{ patient.id }}</td>
+                    <td style="padding: 16px 10px; font-weight: 500;">{{ patient.name }}</td>
+                    <td style="padding: 16px 10px; color: #cbd5e1;">{{ patient.egn }}</td>
+                    <td style="padding: 16px 10px; color: #94a3b8;">{{ patient.last_exam_date }}</td>
+                    <td style="padding: 16px 10px;">
+                        {% if patient.ai_risk_status == 'Malignant' %}
+                            <span style="background: rgba(239, 68, 68, 0.15); color: #f87171; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid rgba(239, 68, 68, 0.2);">Злокачествен</span>
+                        {% elif patient.ai_risk_status == 'Benign' %}
+                            <span style="background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid rgba(34, 197, 94, 0.2);">Доброкачествен</span>
+                        {% else %}
+                            <span style="background: rgba(148, 163, 184, 0.15); color: #cbd5e1; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Няма анализ</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 16px 10px; text-align: right;">
+                        <a href="/doctor/patients/{{ patient.id }}" style="color: #60a5fa; text-decoration: none; font-weight: 600; font-size: 13px; border: 1px solid rgba(96, 165, 250, 0.3); padding: 6px 14px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.background='rgba(96, 165, 250, 0.1)'" onmouseout="this.style.background='transparent'">
+                            Преглед
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="padding: 40px; text-align: center; color: #94a3b8;">
+                        Няма регистрирани пациенти в базата данни.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+{% endblock %}

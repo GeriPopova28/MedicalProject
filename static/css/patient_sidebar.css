@@ -1,0 +1,159 @@
+/* =====================================================
+   ОСНОВНИ И ФОНОВИ СТИЛОВЕ
+===================================================== */
+body {
+    margin: 0;
+    font-family: 'Inter', Arial, sans-serif;
+    background: #0a0a0f;
+    color: #e5e7eb;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* =====================================================
+   СТРАНИЧНО МЕНЮ (SIDEBAR)
+===================================================== */
+.sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #0f172a 0%, #090d16 100%);
+    color: white;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar h2 {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    background: linear-gradient(to right, #ffffff, #93c5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.panel-subtitle {
+    opacity: 0.6;
+    font-size: 13px;
+    margin-bottom: 35px;
+    letter-spacing: 0.5px;
+}
+
+/* Навигация */
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu a {
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.menu a:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    transform: translateX(4px);
+}
+
+.divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    margin: 12px 0;
+}
+
+/* Бутон Изход */
+.logout-btn {
+    color: #f87171 !important;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.15) !important;
+    transform: translateX(4px);
+}
+
+/* Потребителски блок */
+.user-info {
+    margin-top: auto;
+    padding-top: 20px;
+    font-size: 13px;
+    opacity: 0.6;
+    line-height: 1.6;
+}
+
+.user-info b {
+    color: #ffffff;
+    font-size: 14px;
+}
+
+/* =====================================================
+   ОСНОВНО СЪДЪРЖАНИЕ
+===================================================== */
+.content {
+    flex: 1;
+    padding: 0;
+    background: #000000;
+    min-height: 100vh;
+}
+
+/* =====================================================
+   МОБИЛЕН БУТОН ЗА МЕНЮТО
+===================================================== */
+.mobile-toggle {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1100;
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+/* =====================================================
+   ОТГОВОРЕН ДИЗАЙН (RESPONSIVE)
+===================================================== */
+@media (max-width: 900px) {
+    .mobile-toggle {
+        display: block;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        transform: translateX(-100%); 
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .content {
+        padding-top: 65px; 
+    }
+}

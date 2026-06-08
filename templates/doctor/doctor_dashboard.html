@@ -1,0 +1,117 @@
+{% extends 'layouts/base_doctor.html' %}
+
+{% block content %}
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.doctor-page {
+    min-height: 100vh;
+    background: linear-gradient(
+        rgba(2, 6, 23, 0.85),
+        rgba(15, 23, 42, 0.95)
+    ),
+    url('https://images.unsplash.com/photo-1586773860418-d37222d8fce3?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 120px 30px 60px;
+}
+
+.hero h1 {
+    font-size: 60px;
+    font-weight: 800;
+    background: linear-gradient(to right, #38bdf8, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 18px;
+    color: #cbd5e1;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    padding: 50px 40px 80px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 30px;
+    border-radius: 22px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(56, 189, 248, 0.4);
+}
+
+.card h3 {
+    color: #38bdf8;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.card p {
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 25px;
+    color: #94a3b8;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: auto;
+}
+
+@media(max-width:768px){
+    .hero h1 { font-size: 42px; }
+}
+</style>
+
+<div class="doctor-page">
+
+    
+    <!-- HERO -->
+    <div class="hero">
+        <h1>🩺 Doctor Dashboard</h1>
+        <p>Добре дошъл, <b>{{ session.get('user') }}</b> • AI медицинска система за анализ и пациенти</p>
+    </div>
+
+    <!-- CARDS -->
+    <div class="grid">
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        © 2026 MED-AI System • Doctor Panel
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="ai-zone">
+        <h2>🩺 Компютърно подпомагана диагностика (CAD)</h2>
+        <form action="/api/v1/diagnose" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/*" required>
+            <button type="submit">Стартирай EfficientNetB0 анализ</button>
+        </form>
+    </div>
+{% endblock %}

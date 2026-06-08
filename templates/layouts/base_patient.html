@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MED-AI Patient{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/patient_history.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/patient_sidebar.css') }}">
+</head>
+<body>
+
+    <button class="mobile-toggle" aria-label="Алтернативно меню">☰</button>
+
+    <div class="layout">
+        <nav class="sidebar" id="patientSidebar">
+            <h2>MED-AI 2.0</h2>
+            <p class="panel-subtitle">Patient Panel</p>
+
+            <div class="menu">
+                <a href="/patient-dashboard">🏠 Начална страница</a>
+                <a href="/upload">📤 Качване на изображение</a>
+                <a href="/patient-history">📜 История</a>
+                <a href="/endocrine">🧬 Да знам повече</a>
+                <a href="/endocrine_quiz">🧠 Провери знанията си</a>
+                <a href="/endocrine-clinics">🏥 Центрове</a>
+                <div class="divider"></div>
+                <a href="/logout" class="logout-btn">🚪 Изход</a>
+            </div>
+
+            <div class="user-info">
+                Logged as:<br>
+                <b>{{ session.get('user') }}</b>
+            </div>
+        </nav>
+
+        <main class="content">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/patient_sidebar.js') }}"></script>
+</body>
+</html>

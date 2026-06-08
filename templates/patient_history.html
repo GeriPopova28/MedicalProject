@@ -1,0 +1,60 @@
+{% extends 'layouts/base_patient.html' %}
+
+{% block content %}
+
+<div class="history-page">
+
+    <div class="history-header">
+        <h1>📜 Patient History</h1>
+        <p>История на AI анализите и медицинските резултати</p>
+    </div>
+
+    <div class="history-stats">
+        <div class="stat-card">
+            <h3 id="totalAnalyses">0</h3>
+            <span>Общо анализи</span>
+        </div>
+
+        <div class="stat-card">
+            <h3 id="lastPrediction">-</h3>
+            <span>Последна присъда</span>
+        </div>
+
+        <div class="stat-card">
+            <h3 id="lastRisk">-</h3>
+            <span>Ниво на риск</span>
+        </div>
+    </div>
+
+    <div class="filters">
+        <input type="text" id="searchInput" placeholder="🔍 Търсене (статус, дата...)">
+
+        <select id="riskFilter">
+            <option value="">Всички нива на риск</option>
+            <option value="LOW">LOW</option>
+            <option value="MODERATE">MODERATE</option>
+            <option value="HIGH">HIGH</option>
+            <option value="CRITICAL">CRITICAL</option>
+        </select>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Дата и час</th>
+                    <th>Заключение (AI)</th>
+                    <th>Доверителност</th>
+                    <th>Риск</th>
+                    <th style="text-align:center;">Детайли</th>
+                </tr>
+            </thead>
+            <tbody id="historyTable"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/patient_history.js') }}"></script>
+
+{% endblock %}

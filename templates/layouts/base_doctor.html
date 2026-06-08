@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MED-AI Doctor Panel{% endblock %}</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+
+    <button class="mobile-nav-toggle" aria-label="Toggle navigation">☰</button>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="logo">MED-AI</div>
+        
+        <div class="menu">
+            <a href="/doctor-dashboard">🏠 Табло за управление</a>
+            <a href="/doctor/patients">👥 Пациенти</a>
+            <a href="/doctor/statistics">📊 Статистики</a>
+            <a href="/doctor/alerts">🚨 Спешни случаи</a>
+            <div class="divider"></div>
+            <a href="/logout" class="logout">🚪 Изход</a>
+        </div>
+        
+        <div class="user-box">
+            Logged in as:<br>
+            <b>{{ session.get('user') }}</b>
+        </div>
+    </nav>
+
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+{% extends "layouts/base_doctor.html" %}
+
+{% block content %}
+
+<div class="dashboard">
+
+    <div class="dash-header">
+        <h1>Пациентска хронология <span class="sub-title">(Лекарски панел)</span></h1>
+        <p>Мониторинг в реално време на постъпилите медицински досиета от AI системата</p>
+    </div>
+
+    <div class="controls">
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input id="searchInput"
+                   type="text"
+                   placeholder="Търсене на пациент или диагноза..."
+                   class="search-input">
+        </div>
+
+        <div class="btn-group">
+            <button onclick="sortByConfidence()" class="btn-action">
+                <i class="fas fa-chart-bar"></i> Сортирай по доверие
+            </button>
+            <button onclick="sortByDate()" class="btn-action">
+                <i class="far fa-clock"></i> Най-нови
+            </button>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Пациент</th>
+                    <th>AI Находка</th>
+                    <th>Доверие (Conf.)</th>
+                    <th>Степен на риск</th>
+                    <th>Препоръка</th>
+                    <th>Дата и час</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+
+            <tbody id="patients"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/doctor_patients.css') }}">
+
+<!-- JS -->
+<script src="{{ url_for('static', filename='js/doctor_patients.js') }}"></script>
+
+{% endblock %}

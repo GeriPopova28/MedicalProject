@@ -1,0 +1,194 @@
+{% extends 'layouts/base_patient.html' %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+
+<div class="dashboard">
+
+    <div class="dash-header">
+        <h1>Модул за AI Анализ</h1>
+        <p>Качете ехографско изображение и въведете лабораторните изследвания</p>
+    </div>
+
+    <div class="analysis-grid">
+
+        <!-- UPLOAD -->
+        <div class="card upload-card">
+            <h3>Ехографско изображение</h3>
+
+            <form id="uploadForm">
+                <div class="dropzone" id="dropzone"
+                     onclick="document.getElementById('fileInput').click()">
+
+                    <input type="file" id="fileInput"
+                           accept="image/*"
+                           hidden
+                           onchange="previewImage(this)">
+
+                    <div id="dropzoneText">
+                        <p><b>Кликнете за избор</b> или drag & drop</p>
+                    </div>
+
+                    <div id="imagePreviewContainer" style="display:none;">
+                        <img id="imagePreview">
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+        <!-- FORM -->
+        <div class="card form-card">
+
+            <h3>Входни данни</h3>
+
+            <div class="form-grid">
+
+                <div class="form-group complain-group">
+                    <label>Оплаквания</label>
+                    <textarea id="complainInput"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>TSH</label>
+                    <input id="tshInput">
+                </div>
+
+                <div class="form-group">
+                    <label>FT4</label>
+                    <input id="ft4Input">
+                </div>
+
+                <div class="form-group">
+                    <label>MAT</label>
+                    <input id="matInput">
+                </div>
+
+                <div class="form-group">
+                    <label>TAT</label>
+                    <input id="tatInput">
+                </div>
+
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Възраст</label>
+                    <input type="number" name="age">
+                </div>
+
+                <div class="form-group">
+                    <label>Пол</label>
+                        <select name="gender">
+                            <option value="female">Жена</option>
+                            <option value="male">Мъж</option>
+                         </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="family_history">
+                    Фамилна обремененост
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="previous_thyroid_disease">
+                        Предишно заболяване на щитовидната жлеза
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="autoimmune_history">
+                    Автоимунно заболяване
+                </label>
+            </div>
+
+            <button class="btn-analysis" onclick="startAIAnalysis()">
+                Стартирай AI анализ
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- RESULT -->
+    <div class="card result-card" id="resultCard" style="display:none;">
+
+        <h2>Резултат</h2>
+
+        <div class="result-box">
+
+            <div class="result-item">
+                <span class="label">Клинична оценка</span>
+                <span id="resStatus"></span>
+            </div>
+
+            <div class="result-item">
+                <span class="label">AI увереност</span>
+                <span id="resConfidence"></span>
+                <div class="confidence-bar">
+                    <div id="confidenceFill"></div>
+                </div>
+            </div>
+
+            <div class="result-item">
+                <span class="label">Риск</span>
+                <span id="resRiskBadge"></span>
+            </div>
+
+            <div class="result-item">
+                <span class="label">Препоръка</span>
+                <span id="resFollowUp"></span>
+            </div>
+
+            <div class="result-item">
+                <span class="label">Lab</span>
+                <span id="resLab"></span>
+            </div>
+
+            <div class="result-item">
+                <span class="label">Symptom</span>
+                <span id="resSymptom"></span>
+            </div>
+
+            <div class="result-item">
+                <span class="label">Image</span>
+                <span id="resImage"></span>
+            </div>
+
+            <div class="result-item">
+                <span class="label">AI Class</span>
+                <span id="resClass"></span>
+            </div>
+
+            <div class="result-item explain-box">
+                <span class="label">AI интерпретация</span>
+                <div id="resWhyAI"></div>
+            </div>
+
+            <div class="medical-note">
+                ⚠ AI анализ - не е диагноза
+            </div>
+
+            
+
+            <div class="clinic-action">
+                <a href="/endocrine-clinics" class="clinic-btn">
+                    Намери клиники
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+
+{% endblock %}

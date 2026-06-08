@@ -1,0 +1,188 @@
+/* =====================================================
+   ОСНОВНИ НУЛИРАНИЯ И БАЗОВИ СТИЛОВЕ
+===================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background:
+        radial-gradient(circle at top left, #111827, #020617 45%),
+        radial-gradient(circle at bottom right, #0f172a, #030712);
+    color: white;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* =====================================================
+   СТРАНИЧНО МЕНЮ (SIDEBAR)
+===================================================== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 270px;
+    height: 100vh;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 40px;
+    background: linear-gradient(to right, #ffffff, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+}
+
+/* Навигационни линкове */
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.menu a {
+    color: #e2e8f0;
+    text-decoration: none;
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid transparent;
+}
+
+.menu a:hover {
+    background: linear-gradient(to right, rgba(37, 99, 235, 0.22), rgba(59, 130, 246, 0.12));
+    border-color: rgba(96, 165, 250, 0.25);
+    color: white;
+    transform: translateX(6px);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.18);
+}
+
+.divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 18px 0;
+}
+
+/* Специален стил за Изход */
+.logout {
+    background: rgba(239, 68, 68, 0.08) !important;
+    border: 1px solid rgba(239, 68, 68, 0.15) !important;
+}
+
+.logout:hover {
+    background: rgba(239, 68, 68, 0.18) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.18);
+}
+
+/* Потребителски панел долу */
+.user-box {
+    margin-top: auto;
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.user-box b {
+    color: white;
+    font-size: 14px;
+}
+
+/* =====================================================
+   ОСНОВНО СЪДЪРЖАНИЕ (CONTENT)
+===================================================== */
+.content {
+    margin-left: 270px;
+    min-height: 100vh;
+    padding: 30px;
+    color: white;
+    transition: margin-left 0.3s ease;
+}
+
+/* =====================================================
+   ПЕРСОНАЛИЗИРАН СКРОЛБАР
+===================================================== */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* =====================================================
+   МОБИЛЕН БУТОН (ПО ПОДРАЗБИРАНЕ Е СКРИТ)
+===================================================== */
+.mobile-nav-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    background: #1e3a8a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* =====================================================
+   ОТГОВОРЕН ДИЗАЙН (RESPONSIVE)
+===================================================== */
+@media (max-width: 900px) {
+    .mobile-nav-toggle {
+        display: block; /* Показва се при телефони и таблети */
+    }
+
+    .sidebar {
+        transform: translateX(-100%); /* Менюто се скрива наляво */
+        width: 270px;
+    }
+
+    /* Клас, който JavaScript ще добавя за отваряне */
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .content {
+        margin-left: 0;
+        padding: 80px 20px 20px 20px; /* Повече разстояние отгоре заради бутона */
+    }
+}

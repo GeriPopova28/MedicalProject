@@ -1,0 +1,88 @@
+{% extends "layouts/base_doctor.html" %}
+
+{% block content %}
+
+<h2>Критични предупреждения за пациенти</h2>
+
+<div id="alerts">Сигналите се зареждат...</div>
+
+<style>
+
+.alert-card {
+    background: white;
+    border-left: 6px solid #ef4444;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    transition: 0.2s;
+}
+
+.alert-card:hover {
+    transform: translateY(-2px);
+}
+
+.alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge {
+    background: #ef4444;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.small {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+</style>
+
+<script>
+
+async function loadAlerts(){
+
+    const res = await fetch("/doctor/alerts-data");
+    const data = await res.json();
+
+    const container = document.getElementById("alerts");
+
+    if(!data || data.length === 0){
+        container.innerHTML = "<p>Няма пациенти в критично състояние, нуждаещи се от спешна медицинска помощ.</p>";
+        return;
+    }
+
+    container.innerHTML = "";
+
+    data.forEach(p => {
+
+        container.innerHTML += `
+            <div class="alert-card">
+
+                <div class="alert-header">
+                    <h3>🧑 ${p.patient_name || "-"}</h3>
+                    <span class="badge">HIGH RISK</span>
+                </div>
+
+                <p>📌 Prediction: <b>${p.prediction}</b></p>
+                <p>📊 Confidence: ${p.confidence}%</p>
+                <p>💡 Advice: ${p.advice || "-"}</p>
+
+                <p class="small">🕒 ${p.created_at || "-"}</p>
+
+            </div>
+        `;
+    });
+}
+
+loadAlerts();
+
+</script>
+
+{% endblock %}

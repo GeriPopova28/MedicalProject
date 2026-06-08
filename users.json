@@ -1,0 +1,30 @@
+{
+    "geri": {
+        "password": "1",
+        "role": null
+    },
+    "GERI": {
+        "password": "1234",
+        "role": null
+    },
+    "Ivan": {
+        "password": "1",
+        "role": "Patient"
+    },
+    "Geri": {
+        "password": "1",
+        "role": "Patient"
+    },
+    "Popova": {
+        "password": "2",
+        "role": "Doctor"
+    },
+    "W": {
+        "password": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "role": "Doctor"
+    },
+    "test": {
+        "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+        "role": "Patient"
+    }
+}

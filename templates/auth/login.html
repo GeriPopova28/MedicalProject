@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в системата</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 58, 138, 0.8)), 
+                        url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overflow: hidden;
+        }
+
+        .login-box {
+            position: relative;
+            width: 380px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            color: white;
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+            background: linear-gradient(to right, #fff, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            box-sizing: border-box;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: 0.3s;
+        }
+
+        .input:focus {
+            border-color: #60a5fa;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #93c5fd;
+        }
+
+        .roles {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .role {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .role input { display: none; }
+
+        .role div {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .role input:checked + div {
+            background: rgba(37, 99, 235, 0.4);
+            border-color: #60a5fa;
+        }
+
+        /* Контейнер за силата на паролата */
+        .password-strength-wrapper {
+            display: none; /* Скрит при Логин по подразбиране */
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #2563eb;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .switch {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .switch a {
+            color: #60a5fa;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2 id="title">Вход в системата</h2>
+
+    <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input class="input" id="username" placeholder="Потребител">
+    </div>
+
+    <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input class="input" id="password" type="password" placeholder="Парола">
+    </div>
+
+    <div id="roleBox" style="display:none;">
+        <div class="roles">
+            <label class="role">
+                <input type="radio" name="role" value="Doctor" checked>
+                <div>👨‍⚕️ Лекар</div>
+            </label>
+            <label class="role">
+                <input type="radio" name="role" value="Patient">
+                <div>👤 Пациент</div>
+            </label>
+        </div>
+    </div>
+
+    <!-- Обвит в общ контейнер за по-лесно криене/показване -->
+    <div class="password-strength-wrapper" id="strengthWrapper">
+        <div id="strengthText" style="font-size:12px; margin-bottom:5px; color:#93c5fd;">Сила на паролата:</div>
+        <div style="height:5px; background:rgba(255,255,255,0.1); border-radius:5px; overflow:hidden;">
+            <div id="strengthBar" style="height:5px; width:0%; background:#ef4444; transition:0.3s;"></div>
+        </div>
+    </div>
+
+    <button class="btn" onclick="submitForm()" id="loginBtn">Вход</button>
+
+    <div class="switch">
+        <span id="switchText">Нямаш акаунт?</span> 
+        <a onclick="toggle()" id="toggleBtn">Регистрация</a>
+    </div>
+</div>
+
+<script>
+    let login = true;
+
+    // Слушател за натискане на Enter в полетата
+    document.getElementById("username").addEventListener("keypress", handleEnter);
+    document.getElementById("password").addEventListener("keypress", handleEnter);
+
+    function handleEnter(e) {
+        if (e.key === "Enter") {
+            submitForm();
+        }
+    }
+
+    // Логика за динамично следене силата на паролата
+    document.getElementById("password").addEventListener("input", function(e) {
+        if(login) return; // Спираме проверката, ако сме в режим Вход
+        
+        const val = e.target.value;
+        const bar = document.getElementById("strengthBar");
+        const text = document.getElementById("strengthText");
+        
+        let score = 0;
+        if (val.length >= 6) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+
+        if (val.length === 0) {
+            bar.style.width = "0%";
+            text.innerText = "Сила на паролата:";
+        } else if (score <= 1) {
+            bar.style.width = "25%";
+            bar.style.background = "#ef4444"; // Червено
+            text.innerText = "Слаба парола";
+        } else if (score === 2 || score === 3) {
+            bar.style.width = "60%";
+            bar.style.background = "#f59e0b"; // Оранжево
+            text.innerText = "Средна парола";
+        } else {
+            bar.style.width = "100%";
+            bar.style.background = "#10b981"; // Зелено
+            text.innerText = "Силна парола";
+        }
+    });
+
+    function toggle() {
+        login = !login;
+        document.getElementById("title").innerText = login ? "MedAI Login" : "Регистрация";
+        document.getElementById("roleBox").style.display = login ? "none" : "block";
+        document.getElementById("strengthWrapper").style.display = login ? "none" : "block";
+        document.getElementById("switchText").innerText = login ? "Нямаш акаунт?" : "Вече имаш профил?";
+        document.getElementById("toggleBtn").innerText = login ? "Регистрация" : "Вход";
+        document.getElementById("loginBtn").innerText = login ? "Вход" : "Регистрация";
+        
+        // Нулиране на паролата и бар-а при суич
+        document.getElementById("password").value = "";
+        document.getElementById("strengthBar").style.width = "0%";
+        document.getElementById("strengthText").innerText = "Сила на паролата:";
+    }
+
+    async function submitForm() {
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+        const role = document.querySelector('input[name="role"]:checked')?.value || "Patient";
+        const action = login ? "login" : "register";
+        const btn = document.getElementById("loginBtn");
+
+        if (!username || !password) {
+            showError("Моля, попълнете всички полета.");
+            return;
+        }
+
+        // БГ Стрингове за Loading State
+        btn.innerText = login ? "Влизане..." : "Регистриране...";
+        btn.disabled = true;
+
+        try {
+            const res = await fetch("/handle_auth", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password, role, action })
+            });
+
+            const data = await res.json();
+            console.log("AUTH RESPONSE:", data);
+
+            if (data.success === true) {
+                if (data.role === "Doctor") {
+                    window.location.href = "/doctor-dashboard";
+                } else {
+                    window.location.href = "/patient-dashboard";
+                }
+            } else {
+                showError(data.error || "Грешка при автентикация");
+            }
+
+        } catch (err) {
+            console.error(err);
+            showError("Сървърна грешка");
+        } finally {
+            btn.innerText = login ? "Вход" : "Регистрация";
+            btn.disabled = false;
+        }
+    }
+
+    function showError(msg) {
+        // Проверка дали вече има отворено съобщение за грешка, за да не се застъпват
+        const oldBox = document.querySelector(".toast-error");
+        if(oldBox) oldBox.remove();
+
+        const box = document.createElement("div");
+        box.className = "toast-error";
+        box.innerText = msg;
+
+        box.style.position = "fixed";
+        box.style.top = "20px";
+        box.style.right = "20px";
+        box.style.padding = "12px 20px";
+        box.style.background = "rgba(239, 68, 68, 0.95)";
+        box.style.color = "white";
+        box.style.borderRadius = "10px";
+        box.style.boxShadow = "0 10px 30px rgba(0,0,0,0.3)";
+        box.style.zIndex = "9999";
+        box.style.fontFamily = "'Inter', sans-serif";
+
+        document.body.appendChild(box);
+
+        setTimeout(() => {
+            box.remove();
+        }, 3000);
+    }
+</script>
+</body>
+</html>

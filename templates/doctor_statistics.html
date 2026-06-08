@@ -1,0 +1,87 @@
+{% extends 'layouts/base_doctor.html' %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/doctor_statistics.css') }}">
+
+<div class="statistics-page">
+
+    <div class="stats-header-main">
+        <h1>📊 AI Medical Statistics Dashboard</h1>
+        <p>Анализ и визуализация на медицинските AI резултати в реално време</p>
+    </div>
+
+    <!-- TOP CARDS -->
+    <div class="top-cards">
+
+        <div class="mini-card">
+            <div class="mini-icon">🧠</div>
+            <div>
+                <h3 id="totalCases">0</h3>
+                <span>Общо анализи</span>
+            </div>
+        </div>
+
+        <div class="mini-card">
+            <div class="mini-icon">⚠</div>
+            <div>
+                <h3 id="criticalCases">0</h3>
+                <span>Критични случаи</span>
+            </div>
+        </div>
+
+        <div class="mini-card">
+            <div class="mini-icon">📈</div>
+            <div>
+                <h3 id="avgConfidence">0%</h3>
+                <span>Средна увереност</span>
+            </div>
+        </div>
+
+        <div class="mini-card">
+            <div class="mini-icon">🟢</div>
+            <div>
+                <h3 id="normalCases">0</h3>
+                <span>Нормални случаи</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- LOADING (IMPORTANT) -->
+    <div id="loading" style="display:none;text-align:center;color:#38bdf8;">
+        ⏳ Зареждане на данни...
+    </div>
+
+    <!-- CHARTS -->
+    <div class="stats-grid">
+
+        <div class="card glass-card chart-card">
+            <div class="card-header">
+                <h3>⚠ Разпределение на риска</h3>
+                <span class="live-badge">LIVE</span>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="riskChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card glass-card chart-card">
+            <div class="card-header">
+                <h3>📈 Средна увереност на AI</h3>
+                <span class="live-badge blue">AI</span>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="confChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/doctor_statistics.js') }}"></script>
+
+{% endblock %}

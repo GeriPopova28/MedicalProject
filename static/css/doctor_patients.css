@@ -1,0 +1,540 @@
+    /* =====================================================
+   AI MEDICAL DASHBOARD — FULL PREMIUM CSS
+===================================================== */
+
+
+.dashboard {
+    padding: 40px;
+    color: #f1f5f9;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+
+
+    background:
+        radial-gradient(circle at top left, #1e3a8a 0%, transparent 30%),
+        radial-gradient(circle at bottom right, #0f172a 0%, transparent 35%),
+        linear-gradient(135deg, #020617, #0f172a 60%, #111827);
+
+
+    background-attachment: fixed;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+
+.dash-header {
+    margin-bottom: 30px;
+}
+
+
+.dash-header h1 {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 10px;
+
+
+    background: linear-gradient(to right, #ffffff, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+
+    letter-spacing: 0.5px;
+}
+
+
+.sub-title {
+    font-size: 18px;
+    color: #93c5fd;
+    font-weight: 300;
+}
+
+
+.dash-header p {
+    color: #94a3b8;
+    font-size: 14px;
+    margin-top: 0;
+}
+
+
+/* =====================================================
+   CONTROLS
+===================================================== */
+
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+
+.search-wrapper {
+    position: relative;
+    width: 350px;
+}
+
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #93c5fd;
+    font-size: 14px;
+}
+
+
+.search-input {
+    width: 100%;
+    padding: 14px 16px 14px 45px;
+
+
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+
+
+    background: rgba(255,255,255,0.04);
+
+
+    color: white;
+    font-size: 14px;
+
+
+    outline: none;
+
+
+    transition: all 0.25s ease;
+
+
+    backdrop-filter: blur(10px);
+}
+
+
+.search-input::placeholder {
+    color: #94a3b8;
+}
+
+
+.search-input:focus {
+    border-color: #60a5fa;
+
+
+    background: rgba(255,255,255,0.07);
+
+
+    box-shadow:
+        0 0 20px rgba(59,130,246,0.25);
+
+
+    transform: scale(1.02);
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+
+.btn-group {
+    display: flex;
+    gap: 12px;
+}
+
+
+button {
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.25s ease;
+}
+
+
+.btn-action {
+    background: rgba(255,255,255,0.05);
+
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+
+    color: #e2e8f0;
+
+
+    padding: 12px 18px;
+
+
+    border-radius: 14px;
+
+
+    font-weight: 600;
+    font-size: 14px;
+
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+
+    backdrop-filter: blur(10px);
+}
+
+
+.btn-action:hover {
+    background: rgba(37,99,235,0.22);
+
+
+    border-color: #60a5fa;
+
+
+    color: white;
+
+
+    transform: translateY(-2px);
+
+
+    box-shadow:
+        0 10px 25px rgba(37,99,235,0.25);
+}
+
+
+/* =====================================================
+   TABLE WRAPPER
+===================================================== */
+
+
+.table-wrapper {
+    background: rgba(255,255,255,0.04);
+
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+
+    border-radius: 24px;
+
+
+    overflow: hidden;
+
+
+    backdrop-filter: blur(16px);
+
+
+    box-shadow:
+        0 25px 50px rgba(0,0,0,0.35);
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+
+th {
+    background: rgba(15,23,42,0.8);
+    color: #93c5fd;
+    padding: 18px;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+}
+
+
+td {
+    padding: 18px;
+    font-size: 14px;
+    color: #cbd5e1;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: all 0.25s ease;
+}
+
+
+tr {
+    transition: all 0.25s ease;
+}
+
+
+tr:hover td {
+    background: rgba(59,130,246,0.04);
+}
+
+
+/* =====================================================
+   CONFIDENCE BAR
+===================================================== */
+
+
+.confidence-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+
+.confidence-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+
+.confidence-fill {
+    height: 100%;
+    border-radius: 999px;
+    background:
+        linear-gradient(to right, #22c55e, #3b82f6);
+    box-shadow:
+        0 0 12px rgba(59,130,246,0.4);
+}
+
+
+/* =====================================================
+   RISK BADGES
+===================================================== */
+
+
+.badge-risk {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow:
+        0 0 10px rgba(255,255,255,0.05);
+}
+
+
+.risk-high {
+    background: rgba(239,68,68,0.18);
+    color: #f87171;
+    border: 1px solid rgba(239,68,68,0.3);
+    box-shadow:
+        0 0 14px rgba(239,68,68,0.35);
+}
+
+
+.risk-medium {
+    background: rgba(245,158,11,0.18);
+    color: #fbbf24;
+    border: 1px solid rgba(245,158,11,0.3);
+    box-shadow:
+        0 0 14px rgba(245,158,11,0.35);
+}
+
+
+.risk-low {
+    background: rgba(16,185,129,0.18);
+    color: #34d399;
+    border: 1px solid rgba(16,185,129,0.3);
+    box-shadow:
+        0 0 14px rgba(16,185,129,0.35);
+}
+
+
+/* =====================================================
+   OPEN BUTTON
+===================================================== */
+
+
+.btn-toggle-report {
+    background:
+        linear-gradient(to right, #2563eb, #3b82f6);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.25s ease;
+}
+
+
+.btn-toggle-report:hover {
+    transform: translateY(-2px);
+
+
+    box-shadow:
+        0 10px 20px rgba(37,99,235,0.35);
+}
+
+
+/* =====================================================
+   REPORT ROW
+===================================================== */
+
+
+.report-row {
+    background: rgba(15,23,42,0.45);
+
+
+    animation: fadeIn 0.25s ease;
+}
+.report-box {
+    padding: 24px;
+    margin: 14px;
+    border-radius: 16px;
+    background:
+        rgba(255,255,255,0.04);
+    border-left: 4px solid #2563eb;
+    box-shadow:
+        inset 0 0 20px rgba(255,255,255,0.02);
+}
+.report-box h3 {
+    color: #93c5fd;
+    margin-top: 0;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+}
+.report-box p {
+    color: #cbd5e1;
+    line-height: 1.7;
+    font-size: 14px;
+}
+/* =====================================================
+   CONFIRM / REJECT BUTTONS
+===================================================== */
+.btn-confirm,
+.btn-reject {
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+}
+.btn-confirm {
+    background:
+        linear-gradient(to right, #10b981, #22c55e);
+}
+.btn-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 10px 20px rgba(16,185,129,0.35);
+}
+.btn-reject {
+    background:
+        linear-gradient(to right, #ef4444, #f87171);
+}
+.btn-reject:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 10px 20px rgba(239,68,68,0.35);
+}
+/* =====================================================
+   ANIMATION
+===================================================== */
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* =====================================================
+   CUSTOM SCROLLBAR
+===================================================== */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+.btn-pdf {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-pdf:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(59, 130, 246, 0.45);
+}
+
+.btn-pdf:active {
+    transform: scale(0.98);
+}
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+@media (max-width: 950px) {
+    .dashboard {
+        padding: 20px;
+    }
+        .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-wrapper {
+        width: 100%;
+    }
+    .btn-group {
+        width: 100%;
+        flex-direction: column;
+    }
+    .btn-action {
+        width: 100%;
+        justify-content: center;
+    }
+    table {
+        font-size: 12px;
+    }
+    th,
+    td {
+        padding: 12px;
+    }
+}

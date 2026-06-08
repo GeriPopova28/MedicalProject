@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Диагностичен Център</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .upload-card{
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .drop-zone{
+            border: 2px dashed #999;
+            padding: 30px;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .preview-img-element{
+            max-width: 300px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        textarea, input{
+            width: 100%;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+
+        .lab-grid{
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+            gap: 10px;
+        }
+
+        .primary-btn{
+            margin-top: 20px;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .result-card{
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="upload-card">
+
+    <h2>AI Диагностичен Център</h2>
+    <p>Качете ехографско изображение</p>
+
+    <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+        📁 Кликни за качване
+
+        <input type="file" id="fileInput" hidden onchange="previewImage(this)">
+        <p id="fileName"></p>
+        <img id="preview" class="preview-img-element">
+    </div>
+
+    <h3>Оплаквания</h3>
+    <textarea id="symptoms"></textarea>
+
+    <h3>Лаборатория</h3>
+    <div class="lab-grid">
+        <input id="tsh" placeholder="TSH">
+        <input id="ft4" placeholder="FT4">
+        <input id="mat" placeholder="MAT">
+        <input id="tat" placeholder="TAT">
+    </div>
+
+    <button class="primary-btn" onclick="processAnalysis()">
+        Стартирай AI анализ
+    </button>
+
+    <div class="result-card">
+        <h3>Резултат</h3>
+
+        <p>Статус: <b id="status">--</b></p>
+        <p>Confidence: <b id="confidence">--</b></p>
+        <p>Risk: <b id="risk">--</b></p>
+
+        <p id="advice"></p>
+        <p id="explanation"></p>
+    </div>
+</div>
+
+<script>
+
+let selectedFile = null;
+
+/* ================= FILE PREVIEW ================= */
+function previewImage(input){
+    selectedFile = input.files[0];
+
+    if(!selectedFile) return;
+
+    document.getElementById("fileName").innerText = selectedFile.name;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+        const img = document.getElementById("preview");
+        img.src = e.target.result;
+        img.style.display = "block";
+    };
+    reader.readAsDataURL(selectedFile);
+}
+
+/* ================= MAIN AI CALL ================= */
+async function processAnalysis(){
+
+    if(!selectedFile){
+        alert("Избери снимка!");
+        return;
+    }
+
+    try {
+        let formData = new FormData();
+        formData.append("file", selectedFile);
+
+        const res = await fetch("/predict", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+
+        console.log("RESPONSE:", data);
+
+        if(!data.success){
+            alert(data.error || "Error from server");
+            return;
+        }
+
+        document.getElementById("status").innerText = data.prediction;
+        document.getElementById("confidence").innerText = data.confidence + "%";
+        document.getElementById("risk").innerText = data.risk_level;
+        document.getElementById("advice").innerText = data.advice;
+        document.getElementById("explanation").innerText = data.explanation;
+
+        // refresh history safely
+        loadHistory();
+
+    } catch (err) {
+        console.error("Fetch error:", err);
+        alert("Грешка при връзка със сървъра");
+    }
+}
+
+/* ================= HISTORY FIX ================= */
+async function loadHistory(){
+    try {
+        const res = await fetch("/patient-data");
+        const data = await res.json();
+
+        console.log("HISTORY:", data);
+
+        // ако имаш UI за history - update тук
+        // renderTable(data);
+        // updateStats(data);
+
+    } catch (err) {
+        console.error("History error:", err);
+    }
+}
+
+</script>
+
+</body>
+</html>

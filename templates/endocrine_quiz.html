@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Endocrine Quiz</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/endocrine_quiz.css') }}">
+</head>
+
+<body>
+
+<div class="card">
+
+    <div class="title">🧠 Ендокринен тест</div>
+
+    <div class="subtitle">
+        Интелигентен медицински тест с AI генерирани въпроси
+    </div>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div id="progress-text">Въпрос 0 / 10</div>
+
+    <div id="loader">Генериране на въпрос...</div>
+
+    <div id="quiz"></div>
+
+    <div id="result" class="result-box"></div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/endocrine_quiz.js') }}"></script>
+
+</body>
+</html>
