@@ -9,16 +9,9 @@ from tensorflow.keras import layers, models
 from sklearn.utils import class_weight
 from sklearn.metrics import classification_report, confusion_matrix
 
-# =========================
-# CONFIG
-# =========================
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 16
 DATASET_DIR = "dataset"
-
-# =========================
-# MODEL
-# =========================
 def build_model():
 
     base_model = EfficientNetB0(
@@ -56,7 +49,7 @@ def build_model():
 def train():
 
     datagen = ImageDataGenerator(
-        preprocessing_function=preprocess_input,   # ✅ FIX (важно!)
+        preprocessing_function=preprocess_input,  
         rotation_range=20,
         zoom_range=0.2,
         width_shift_range=0.1,
@@ -85,9 +78,6 @@ def train():
 
     print("\nCLASS MAP:", train_gen.class_indices)
 
-    # =========================
-    # FIX class weights (IMPORTANT)
-    # =========================
     class_weights_raw = class_weight.compute_class_weight(
         class_weight="balanced",
         classes=np.unique(train_gen.classes),
@@ -103,9 +93,6 @@ def train():
 
     model, base_model = build_model()
 
-    # =========================
-    # STAGE 1
-    # =========================
     model.compile(
         optimizer=tf.keras.optimizers.Adam(3e-4),
         loss="categorical_crossentropy",
@@ -121,9 +108,6 @@ def train():
         use_multiprocessing=False  
     )
 
-    # =========================
-    # STAGE 2
-    # =========================
     base_model.trainable = True
 
     for layer in base_model.layers[:-30]:
@@ -144,9 +128,6 @@ def train():
         use_multiprocessing=False  
     )
 
-    # =========================
-    # SAVE
-    # =========================
     model.save("ai_model_real.keras")
     print("\nMODEL SAVED SUCCESSFULLY")
 

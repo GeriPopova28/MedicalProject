@@ -3,7 +3,6 @@ import io
 from utils.db import get_db
 from utils.auth_helpers import is_doctor
 
-# ReportLab библиотеки за генерирането на PDF-а
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -12,12 +11,8 @@ from reportlab.lib.enums import TA_CENTER
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-# Дефиниране на Блупринта
 doctor_bp = Blueprint('doctor', __name__)
 
-# =====================================================
-# 1. СТАТИСТИКИ И ДАННИ ЗА ПАЦИЕНТИТЕ
-# =====================================================
 @doctor_bp.route('/doctor/stats-data')
 def doctor_stats_data():
     if not is_doctor():
@@ -25,7 +20,7 @@ def doctor_stats_data():
 
     user_id = session.get("user_id")
     if not user_id:
-        return jsonify([]), 200 # Винаги връща масив, за да не гърми Frontend-а
+        return jsonify([]), 200
 
     try:
         conn = get_db()
@@ -59,7 +54,7 @@ def doctor_stats_data():
             "created_at": r["created_at"].isoformat() if r["created_at"] else None
         } for r in rows]
 
-        return jsonify(result) # Винаги връща чист JSON масив
+        return jsonify(result)
 
     except Exception as e:
         print("Грешка в stats-data:", e)
@@ -68,10 +63,6 @@ def doctor_stats_data():
         if 'cursor' in locals() and cursor: cursor.close()
         if 'conn' in locals() and conn: conn.close()
 
-
-# =====================================================
-# 2. ГЕНЕРИРАНЕ НА МЕДИЦИНСКИ PDF РЕПОРТ
-# =====================================================
 @doctor_bp.route('/doctor/generate-pdf/<int:analysis_id>')
 def generate_medical_pdf(analysis_id):
     if not is_doctor():
@@ -98,7 +89,6 @@ def generate_medical_pdf(analysis_id):
 
         buffer = io.BytesIO()
 
-        # Зареждане на Arial шрифт за поддръжка на Кирилица в Windows
         pdfmetrics.registerFont(
             TTFont('Arial', r'C:\Windows\Fonts\arial.ttf')
         )
@@ -151,12 +141,10 @@ def generate_medical_pdf(analysis_id):
 
         story = []
 
-        # БОЛНИЧЕН ХЕДЪР
         story.append(Paragraph("UNIVERSITY HOSPITAL MEDICAL CENTER", title_style))
         story.append(Paragraph("Endocrinology Department • AI Clinical Report", normal))
         story.append(Spacer(1, 10))
 
-        # ТАБЛИЦА С ИНФОРМАЦИЯ ЗА ПАЦИЕНТА
         patient_info = [
             ["Patient", result.get('patient_name', '-')],
             ["Report ID", str(result.get('id', '-'))],
@@ -177,30 +165,25 @@ def generate_medical_pdf(analysis_id):
         story.append(table)
         story.append(Spacer(1, 15))
 
-        # РЕЗУЛТАТИ ОТ ДИАГНОСТИКАТА
         story.append(Paragraph("CLINICAL DIAGNOSIS", section))
         story.append(Paragraph(f"AI Prediction: {result.get('prediction', '-')}", normal))
         story.append(Paragraph(f"Confidence Rate: {result.get('confidence', 0)}%", normal))
         story.append(Paragraph(f"Assigned Risk: {result.get('risk_level', '-')}", normal))
 
-        # ПРЕПОРЪКИ
         story.append(Spacer(1, 10))
         story.append(Paragraph("MEDICAL RECOMMENDATION", section))
         story.append(Paragraph(result.get('advice', '-'), normal))
 
-        # ПОДРОБЕН АНАЛИЗ (EXPLANATION)
         story.append(Paragraph("CLINICAL ANALYSIS", section))
         explanation = (result.get('explanation') or "-").replace("\n", "<br/>")
         story.append(Paragraph(explanation, normal))
 
-        # ДЕКЛАРАЦИЯ ЗА ОГРАНИЧАВАНЕ НА ОТГОВОРНОСТТА
         story.append(Spacer(1, 20))
         story.append(Paragraph(
             "Notice: This is an AI-generated medical evaluation report. It is intended solely for supportive decision-making and strict validation by a licensed medical clinician is required.",
             small
         ))
 
-        # ПОДПИСИ
         story.append(Spacer(1, 15))
         signature = Table([
             ["Attending Physician", "MED-AI System"],
@@ -236,9 +219,6 @@ def generate_medical_pdf(analysis_id):
         if conn: conn.close()
 
 
-# =====================================================
-# 3. ПОТВЪРЖДЕНИЕ / КОРЕКЦИЯ НА ДИАГНОЗАТА ОТ ЛЕКАР
-# =====================================================
 @doctor_bp.route('/doctor/diagnosis-decision', methods=['POST'])
 def diagnosis_decision():
     if not is_doctor():
@@ -250,7 +230,7 @@ def diagnosis_decision():
     try:
         data = request.get_json(silent=True) or {}
         analysis_id = data.get("analysis_id")
-        decision = data.get("decision") # Напр. 'Approved' или 'Rejected'
+        decision = data.get("decision") 
 
         if analysis_id is None or decision is None:
             return jsonify({"success": False, "error": "Missing required fields"}), 400

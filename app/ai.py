@@ -7,9 +7,6 @@ import os
 
 ai = Blueprint("ai", __name__)
 
-# =========================
-# LOAD MODEL
-# =========================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "ai_model.h5")
 
@@ -22,20 +19,12 @@ if os.path.exists(MODEL_PATH):
     except Exception as e:
         print("Model load error:", e)
 
-
-# =========================
-# SAFE FLOAT
-# =========================
 def safe_float(val):
     try:
         return float(val)
     except:
         return 0.0
 
-
-# =========================
-# PREDICT ROUTE
-# =========================
 @ai.route("/predict", methods=["POST"])
 def predict():
 
@@ -46,10 +35,6 @@ def predict():
 
     if not file:
         return jsonify({"success": False, "error": "No file"}), 400
-
-    # =========================
-    # IMAGE PROCESSING
-    # =========================
     img = cv2.imdecode(
         np.frombuffer(file.read(), np.uint8),
         cv2.IMREAD_COLOR
@@ -60,9 +45,6 @@ def predict():
 
     img = cv2.resize(img, (224, 224))
 
-    # =========================
-    # LAB VALUES
-    # =========================
     tsh = safe_float(request.form.get("tsh"))
     ft4 = safe_float(request.form.get("ft4"))
     mat = safe_float(request.form.get("mat"))
@@ -70,9 +52,6 @@ def predict():
 
     complain = (request.form.get("complain") or "").lower()
 
-    # =========================
-    # SYMPTOMS SCORE
-    # =========================
     symptom_score = 0
 
     keywords = {
@@ -91,9 +70,6 @@ def predict():
 
     symptom_score = min(symptom_score, 100)
 
-    # =========================
-    # LAB SCORE
-    # =========================
     lab_score = 0
 
     if tsh > 4.5:
@@ -112,9 +88,6 @@ def predict():
 
     lab_score = min(lab_score, 100)
 
-    # =========================
-    # IMAGE SCORE (AI MODEL)
-    # =========================
     image_score = 0
     ai_verdict = "Нормално"
 
@@ -137,9 +110,6 @@ def predict():
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 500
 
-    # =========================
-    # FINAL SCORE
-    # =========================
     final_score = (
         image_score * 0.5 +
         lab_score * 0.35 +
@@ -148,9 +118,6 @@ def predict():
 
     final_score = max(0, min(final_score, 99))
 
-    # =========================
-    # RISK
-    # =========================
     if final_score >= 80:
         risk = "HIGH"
         advice = "Спешна консултация"
@@ -162,10 +129,7 @@ def predict():
     else:
         risk = "LOW"
         advice = "Нормално състояние"
-
-    # =========================
-    # RESPONSE
-    # =========================
+        
     return jsonify({
         "success": True,
         "prediction": ai_verdict,

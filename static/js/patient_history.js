@@ -51,41 +51,40 @@ function updateStats(data){
     }
 }
 
-
 function renderTable(data){
     const table = document.getElementById("historyTable");
     table.innerHTML = "";
 
-
     if(data.length === 0){
         table.innerHTML = `
             <tr>
-                <td colspan="5" style="text-align:center; opacity:0.7; padding:30px;">
+                <td colspan="6" style="text-align:center; opacity:0.7; padding:30px;">
                     Няма налични AI анализи
                 </td>
             </tr>
         `;
         return;
     }
-    let tableHtml = ""; // Оптимизация: Създаваме HTML низа наведнъж
+    
+    let tableHtml = ""; 
     data.forEach((item, index) => {
         let riskClass = "moderate";
         const r = String(item.risk_level).toUpperCase();
         if(r === "LOW") riskClass = "low";
         else if(r === "HIGH") riskClass = "high";
         else if(r === "CRITICAL") riskClass = "critical";
-            let aiClassColor = "";
-            if(item.ai_class === "Benign")
-                aiClassColor = "green";
-            if(item.ai_class === "Malignant")
-                aiClassColor = "red";
-            if(item.ai_class === "Uncertain")
-                aiClassColor = "orange";
+
+        let aiClassColor = "";
+        if(item.ai_class === "Benign") aiClassColor = "green";
+        else if(item.ai_class === "Malignant") aiClassColor = "red";
+        else if(item.ai_class === "Uncertain") aiClassColor = "orange";
+
         const formattedDate = formatDate(item.created_at);
         const explanationText = 
             item.explanation && item.explanation.trim()
             ? item.explanation
             : "Няма допълнителен текстов отчет за този анализ.";
+
         tableHtml += `
             <tr class="main-row">
                 <td>${formattedDate}</td>
@@ -94,16 +93,13 @@ function renderTable(data){
                 <td style="color:${aiClassColor}; font-weight:600;">
                     ${item.ai_class || "-"}
                 </td>
-                <td style="color:${aiClassColor}">
-                    ${item.ai_class || "-"}
-                </td>
                 <td class="${riskClass}">${r || "-"}</td>
                 <td style="text-align: center;">
                     <button class="btn-toggle-details" onclick="toggleDetails(${index})">Виж отчет</button>
                 </td>
             </tr>
             <tr id="details-${index}" class="details-row" style="display: none;">
-                <td colspan="7">
+                <td colspan="6">
                     <div class="details-box">
                         ${explanationText}
                     </div>
@@ -112,9 +108,9 @@ function renderTable(data){
         `;
     });
 
-
-    table.innerHTML = tableHtml; // Вмъкваме всичко наведнъж в DOM дървото
+    table.innerHTML = tableHtml;
 }
+
 // Функция за разгъване и свиване на медицинския отчет
 function toggleDetails(index) {
     const row = document.getElementById(`details-${index}`);

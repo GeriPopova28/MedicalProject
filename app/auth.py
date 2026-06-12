@@ -7,9 +7,6 @@ import os
 
 auth = Blueprint("auth", __name__)
 
-# =========================
-# DB CONFIG
-# =========================
 db_config = {
     "host": "localhost",
     "user": "root",
@@ -20,9 +17,7 @@ db_config = {
 def get_db():
     return mysql.connector.connect(**db_config)
 
-# =========================
-# HELPERS
-# =========================
+
 def is_strong_password(password: str) -> bool:
     if len(password) < 8:
         return False
@@ -32,9 +27,7 @@ def is_strong_password(password: str) -> bool:
         return False
     return True
 
-# =========================
-# LOGIN / REGISTER
-# =========================
+
 @auth.route("/handle_auth", methods=["POST"])
 def handle_auth():
 
@@ -52,7 +45,6 @@ def handle_auth():
 
     try:
 
-        # ================= REGISTER =================
         if action == "register":
 
             role = data.get("role", "Patient")
@@ -84,7 +76,6 @@ def handle_auth():
             conn.commit()
             user_id = cursor.lastrowid
 
-            # create patient profile if needed
             if role == "Patient":
                 cursor.execute("""
                     INSERT INTO patients (user_id, full_name)
@@ -99,7 +90,6 @@ def handle_auth():
 
             return jsonify({"success": True, "role": role})
 
-        # ================= LOGIN =================
         cursor.execute("""
             SELECT id, username, password, role, failed_attempts, lock_until
             FROM users
@@ -111,7 +101,6 @@ def handle_auth():
         if not user:
             return jsonify({"success": False, "error": "User not found"}), 404
 
-        # LOCK CHECK
         if user["lock_until"]:
             if user["lock_until"] > datetime.now():
                 return jsonify({"success": False, "error": "Account locked"}), 403
@@ -123,7 +112,6 @@ def handle_auth():
             """, (user["id"],))
             conn.commit()
 
-        # WRONG PASSWORD
         if not check_password_hash(user["password"], password):
 
             attempts = user["failed_attempts"] + 1
@@ -143,7 +131,6 @@ def handle_auth():
 
             return jsonify({"success": False, "error": "Wrong password"}), 401
 
-        # SUCCESS LOGIN
         cursor.execute("""
             UPDATE users
             SET failed_attempts=0, lock_until=NULL
@@ -169,10 +156,6 @@ def handle_auth():
         cursor.close()
         conn.close()
 
-
-# =========================
-# LOGOUT
-# =========================
 @auth.route("/logout")
 def logout():
     session.clear()

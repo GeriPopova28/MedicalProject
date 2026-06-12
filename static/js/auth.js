@@ -33,15 +33,15 @@ let login = true;
             text.innerText = "Сила на паролата:";
         } else if (score <= 1) {
             bar.style.width = "25%";
-            bar.style.background = "#ef4444"; // Червено
+            bar.style.background = "#ef4444"; 
             text.innerText = "Слаба парола";
         } else if (score === 2 || score === 3) {
             bar.style.width = "60%";
-            bar.style.background = "#f59e0b"; // Оранжево
+            bar.style.background = "#f59e0b";
             text.innerText = "Средна парола";
         } else {
             bar.style.width = "100%";
-            bar.style.background = "#10b981"; // Зелено
+            bar.style.background = "#10b981";
             text.innerText = "Силна парола";
         }
     });
@@ -66,14 +66,11 @@ let login = true;
     function submitForm() {
     const usernameInput = document.getElementById("username").value;
     const passwordInput = document.getElementById("password").value;
-    
-    // В зависимост от това дали бутонът показва "Вход" или "Регистрация"
-    // (актуалното състояние се пази в променлива или се разбира по текста на бутона)
+
     const isRegister = document.getElementById("loginBtn").innerText.trim() === "Регистрация";
     const actionType = isRegister ? "register" : "login";
 
-    // Извличане на ролята само ако сме в режим на регистрация
-    let selectedRole = "Patient"; // по подразбиране
+    let selectedRole = "Patient"; 
     if (isRegister) {
         const roleRadio = document.querySelector('input[name="role"]:checked');
         if (roleRadio) {
@@ -86,7 +83,6 @@ let login = true;
         return;
     }
 
-    // 🔥 СМЕНЯМЕ АДРЕСА НА /handle_auth (вместо стария /login)
     fetch('/handle_auth', {
         method: 'POST',
         headers: {
@@ -95,8 +91,8 @@ let login = true;
         body: JSON.stringify({
             username: usernameInput,
             password: passwordInput,
-            action: actionType,  // пращаме 'login' или 'register' към auth.py
-            role: selectedRole   // пращаме ролята
+            action: actionType,  
+            role: selectedRole   
         })
     })
     .then(response => response.json())
@@ -104,10 +100,8 @@ let login = true;
         if (data.success) {
             if (actionType === "register") {
                 alert(data.message || "Регистрацията е успешна! Сега можете да влезете.");
-                toggle(); // Връщаме формата автоматично в режим за Логин
+                toggle(); 
             } else {
-                // При успешен вход пренасочваме към главната страница '/'
-                // main_app.py автоматично ще разпредели лекаря или пациента
                 window.location.href = '/'; 
             }
         } else {
@@ -122,7 +116,6 @@ let login = true;
 
 
     function showError(msg) {
-        // Проверка дали вече има отворено съобщение за грешка, за да не се застъпват
         const oldBox = document.querySelector(".toast-error");
         if(oldBox) oldBox.remove();
 

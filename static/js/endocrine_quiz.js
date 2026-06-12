@@ -16,19 +16,24 @@ window.onload = () => {
 };
 
 // LOAD QUESTION
+// LOAD QUESTION
 async function loadQuiz(){
 
     document.getElementById("loader").style.display = "block";
     document.getElementById("result").style.display = "none";
 
     try{
+        // Взимаме последните данни на пациента от localStorage (записани при предишен анализ/качване)
+        const savedData = JSON.parse(localStorage.getItem("last_analysis")) || {};
+        const labData = savedData.lab_data || { tsh: 0.0, ft4: 0.0 }; 
+        const symptomsList = savedData.symptoms || "няма въведени симптоми";
 
         const res = await fetch("/generate_ai_quiz", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                lab_data: { tsh: 5.2 },
-                symptoms: "fatigue",
+                lab_data: labData,
+                symptoms: symptomsList,
                 history: []
             })
         });
@@ -61,8 +66,8 @@ async function loadQuiz(){
         });
 
         html += `
-            <button id="check-btn" onclick="checkAnswer()">✔ Check</button>
-            <button id="next-btn" onclick="nextQuestion()" style="display:none;">Next</button>
+            <button id="check-btn" onclick="checkAnswer()">✔ Провери</button>
+            <button id="next-btn" onclick="nextQuestion()" style="display:none;">Следващ</button>
         `;
 
         document.getElementById("quiz").innerHTML = html;
@@ -71,7 +76,7 @@ async function loadQuiz(){
 
     }catch(err){
         document.getElementById("loader").style.display = "none";
-        showError("Server error");
+        showError("Грешка при връзка със сървъра");
     }
 }
 
@@ -125,7 +130,7 @@ function showFinal(){
     const percent = Math.round((correctCount / totalQuestions) * 100);
 
     document.getElementById("quiz").innerHTML = `
-        <h2>🎉 Finished</h2>
+        <h2>Завършено</h2>
         <div class="final-score">${percent}%</div>
     `;
 

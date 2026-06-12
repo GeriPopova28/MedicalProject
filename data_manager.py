@@ -1,5 +1,5 @@
 import mysql.connector
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class DataManager:
 
@@ -25,9 +25,11 @@ class DataManager:
             db.close()
             return False
 
+        hashed_password = generate_password_hash(password)
+
         cursor.execute(
             "INSERT INTO users (username, password, role) VALUES (%s, %s, %s)",
-            (username, password, role)
+            (username, hashed_password, role)
         )
 
         db.commit()
@@ -37,7 +39,7 @@ class DataManager:
         return True
 
     # ================= LOGIN =================
-    def login_user(self, username):
+    def login_user(self, username, password_input):
         db = self.get_connection()
         cursor = db.cursor(dictionary=True)
 
@@ -51,4 +53,7 @@ class DataManager:
         cursor.close()
         db.close()
 
-        return user
+        if user and check_password_hash(user['password'], password_input):
+            return user
+        
+        return None

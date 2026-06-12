@@ -1,62 +1,45 @@
-from fileinput import filename
-from unittest import result
-import uuid
-
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
-from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import io
+import re
+import random
+import uuid
+from datetime import datetime, timedelta
+from functools import wraps
+
 import cv2
 import numpy as np
 import mysql.connector
+import qrcode
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-import random
-import re
-from datetime import datetime
-from flask import request, jsonify
-from datetime import datetime, timedelta
-from flask import send_file
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.cidfonts import UnicodeCIDFont
-import io
-from reportlab.lib.pagesizes import A4
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer,
-    Table,
-    TableStyle
+from dotenv import load_dotenv
+
+from flask import (
+    Flask, render_template, request, jsonify, session, 
+    redirect, url_for, send_file, g
 )
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.cidfonts import UnicodeCIDFont
-from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.pdfbase.ttfonts import TTFont
-
-import qrcode
-from reportlab.platypus import Image
-import os
-
-import io
-import os
-import qrcode
-
-from flask import send_file, session
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
-)
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
-from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+from reportlab.pdfbase.ttfonts import TTFont
+
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file, g
+
+def doctor_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get("logged_in") or session.get("role") != "Doctor":
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.content_type == 'application/json':
+                return jsonify({"success": False, "error": "Нямате права за достъп"}), 403
+            return redirect(url_for('login_page'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 def validate_future_datetime(date, time):
     try:
@@ -65,20 +48,12 @@ def validate_future_datetime(date, time):
     except:
         return False
 
-# =====================================================
-# APP SETUP
-# =====================================================
-
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
 app.secret_key = os.environ.get(
     "FLASK_SECRET_KEY",
     "super_secret_diploma_key_2026"
 )
-
-# =====================================================
-# HELPERS
-# =====================================================
 
 def is_logged_in():
     return 'user' in session
@@ -99,14 +74,26 @@ def is_strong_password(password: str) -> bool:
     return True
 
 db_config = {
-    "host": "localhost",
-    "user": "root",
-    "password": "GeriP2807",
-    "database": "medical_ai"
+    "host": os.getenv("DB_HOST", "localhost"),
+    "user": os.getenv("DB_USER", "root"),
+    "password": os.getenv("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME", "medical_ai")
 }
 
 def get_db():
-    return mysql.connector.connect(**db_config)
+    if 'db' not in g:
+        g.db = mysql.connector.connect(**db_config)
+    return g.db
+
+@app.teardown_appcontext
+def close_db(error):
+    db = g.pop('db', None)
+    if db is not None:
+        try:
+            db.close()
+        except Exception as e:
+            print("Грешка при затваряне на DB връзката:", e)
+
 
 def safe_float(value):
     try:
@@ -118,9 +105,6 @@ def safe_float(value):
 def clamp(value, min_v, max_v):
     return max(min_v, min(value, max_v))
 
-# =====================================================
-# AI MODEL
-# =====================================================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "ai_model.h5")
@@ -128,7 +112,6 @@ MODEL_PATH = os.path.join(BASE_DIR, "ai_model.h5")
 print("MODEL PATH:", MODEL_PATH)
 print("EXISTS:", os.path.exists(MODEL_PATH))
 
-# 🔥 DEBUG: check file content
 with open(MODEL_PATH, "rb") as f:
     print(f.read(20))
 
@@ -148,9 +131,6 @@ if os.path.exists(MODEL_PATH):
     except Exception as e:
         print("Model error:", e)
 
-# =====================================================
-# HOME
-# =====================================================
 
 @app.route('/')
 def home():
@@ -161,9 +141,6 @@ def home():
         return redirect(url_for('doctor_dashboard'))
 
     return redirect(url_for('patient_dashboard'))
-# =====================================================
-# AUTH
-# =====================================================
 
 @app.route('/login')
 def login_page():
@@ -193,9 +170,6 @@ def handle_auth():
         conn = get_db()
         cursor = conn.cursor(dictionary=True)
 
-        # =====================================================
-        # REGISTER
-        # =====================================================
         if action == "register":
 
             role = data.get("role", "Patient")
@@ -249,9 +223,7 @@ def handle_auth():
                 "id": user_id
             })
 
-        # =====================================================
-        # LOGIN
-        # =====================================================
+
         cursor.execute("""
             SELECT id, username, password, role, failed_attempts, lock_until
             FROM users
@@ -266,7 +238,6 @@ def handle_auth():
                 "error": "User not found"
             }), 404
 
-        # ================= LOCK CHECK =================
 
         if user["lock_until"]:
             if user["lock_until"] > datetime.now():
@@ -284,7 +255,6 @@ def handle_auth():
             """, (user["id"],))
             conn.commit()
 
-        # ================= WRONG PASSWORD =================
         if not check_password_hash(user["password"], password):
 
             attempts = user["failed_attempts"] + 1
@@ -308,7 +278,6 @@ def handle_auth():
                 "error": "Wrong password"
             }), 401
 
-        # ================= SUCCESS LOGIN =================
         cursor.execute("""
             UPDATE users
             SET failed_attempts = 0,
@@ -339,7 +308,6 @@ def handle_auth():
     finally:
         try:
             cursor.close()
-            conn.close()
         except:
             pass
 
@@ -349,9 +317,7 @@ def debug_session():
     return jsonify({
         "session": dict(session)
     }) 
-# =====================================================
-# DASHBOARDS
-# =====================================================
+
 @app.route('/patient-dashboard')
 def patient_dashboard():
 
@@ -375,9 +341,6 @@ def doctor_dashboard():
 
     return render_template("doctor/doctor_dashboard.html")
 
-# =====================================================
-# UPLOAD PAGE
-# =====================================================
 
 @app.route('/upload')
 def upload_page():
@@ -389,9 +352,7 @@ def upload_page():
         return redirect(url_for('doctor_dashboard'))
 
     return render_template("upload.html")
-# =====================================================
-# EDUCATION
-# =====================================================
+
 
 @app.route('/endocrine')
 def endocrine():
@@ -404,10 +365,6 @@ def endocrine_quiz():
 @app.route('/endocrine-clinics')
 def endocrine_clinics():
     return render_template("endocrine_clinics.html")
-
-# =====================================================
-# PATIENT HISTORY PAGE
-# =====================================================
 
 @app.route('/patient-history')
 def patient_history():
@@ -472,7 +429,6 @@ def patient_data():
         return jsonify([]), 500
     finally:
         cursor.close()
-        conn.close()
 
 # =====================================================
 # AI PREDICT
@@ -496,8 +452,6 @@ def doctor_patients_data():
         data = cursor.fetchall()
 
         cursor.close()
-        conn.close()
-
         return jsonify(data)
 
     except Exception as e:
@@ -561,8 +515,6 @@ def doctor_alerts_data():
         data = cursor.fetchall()
 
         cursor.close()
-        conn.close()
-
         return jsonify(data)
 
     except Exception as e:
@@ -585,8 +537,6 @@ def api_doctors():
         data = cursor.fetchall()
 
         cursor.close()
-        conn.close()
-
         return jsonify(data)
 
     except Exception as e:
@@ -664,8 +614,6 @@ def pending_analyses():
                 row["created_at"] = str(row["created_at"])
 
         cursor.close()
-        conn.close()
-
         return jsonify({
             "success": True,
             "count": len(data),
@@ -737,8 +685,6 @@ def update_analysis(id):
         if not existing:
 
             cursor.close()
-            conn.close()
-
             return jsonify({
                 "success": False,
                 "error": "Analysis not found"
@@ -760,8 +706,6 @@ def update_analysis(id):
         conn.commit()
 
         cursor.close()
-        conn.close()
-
         return jsonify({
             "success": True,
             "message": "Analysis updated successfully"
@@ -834,7 +778,6 @@ def appointments_data():
                 row["confidence"] = float(row["confidence"])
 
         cursor.close()
-        conn.close()
 
         return jsonify(data)
 
@@ -944,7 +887,7 @@ def predict():
     extra_score = 0
     confidence = 0.0
 
-    explanation = ""   # ✅ FIX HERE
+    explanation = "" 
 
     try:
         if ai_model:
@@ -1057,7 +1000,7 @@ def predict():
             confidence,
             risk_level,
             advice,
-            explanation,   # ✅ FIX
+            explanation,  
             ai_class,
             lab_score,
             symptom_score,
@@ -1074,7 +1017,6 @@ def predict():
 
     finally:
         cursor.close()
-        conn.close()
 
     return jsonify({
         "success": True,
@@ -1473,7 +1415,7 @@ def book_appointment():
             }), 400
 
         # =========================
-        # 🚫 BLOCK WEEKENDS (IMPORTANT ADDITION)
+        # BLOCK WEEKENDS
         # =========================
         weekday = selected_dt.weekday()
         if weekday == 5 or weekday == 6:
@@ -1539,8 +1481,6 @@ def book_appointment():
         try:
             if cursor:
                 cursor.close()
-            if conn:
-                conn.close()
         except:
             pass
 
@@ -1560,7 +1500,6 @@ def doctor_availability(doctor_id, date):
         rows = cursor.fetchall()
 
         cursor.close()
-        conn.close()
 
         booked = []
 
@@ -1621,8 +1560,6 @@ def set_availability():
 
     finally:
         cursor.close()
-        conn.close()
-
 
 @app.route("/doctor/generated-slots/<int:doctor_id>/<date>")
 def generated_slots(doctor_id, date):
@@ -1661,7 +1598,6 @@ def generated_slots(doctor_id, date):
     finally:
         try:
             cursor.close()
-            conn.close()
         except:
             pass
 
@@ -1893,9 +1829,9 @@ def doctor_stats_data():
 
     finally:
         if 'cursor' in locals(): cursor.close()
-        if 'conn' in locals(): conn.close()
 
 @app.route('/doctor/generate-pdf/<int:analysis_id>', methods=["POST"])
+@doctor_required
 def generate_medical_pdf(analysis_id):
 
     import os
@@ -1903,6 +1839,13 @@ def generate_medical_pdf(analysis_id):
     from datetime import datetime
     from reportlab.pdfgen import canvas
     from reportlab.lib.pagesizes import A4
+    from reportlab.platypus import Paragraph, Spacer, Table, TableStyle, Image
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    from flask import send_file, request
 
     conn = None
     cursor = None
@@ -2017,9 +1960,6 @@ def generate_medical_pdf(analysis_id):
 
         story = []
 
-        from reportlab.platypus import Image, Table
-        import os
-
         # ======================
         # HEADER
         # ======================
@@ -2077,9 +2017,6 @@ def generate_medical_pdf(analysis_id):
         # ======================
         # ЕХОГРАФИЯ
         # ======================
-        from reportlab.platypus import Image
-        import os
-
         image_path = result.get("image_path")
 
         if image_path and os.path.exists(image_path):
@@ -2145,7 +2082,7 @@ def generate_medical_pdf(analysis_id):
         story.append(patient_table)
 
         # ======================
-        #ПРЕПОРЪКА
+        # ПРЕПОРЪКА
         # ======================
         story.append(Spacer(1, 10))
         story.append(Paragraph("МЕДИЦИНСКА ПРЕПОРЪКА", section))
@@ -2160,7 +2097,11 @@ def generate_medical_pdf(analysis_id):
         for line in str(final_explanation).splitlines():
             line = line.strip()
             if line:
-                story.append(Paragraph(line, normal))
+                if ":" in line:
+                    parts = line.split(":", 1)
+                    story.append(Paragraph(f"<b>{parts[0].strip()}</b>: {parts[1].strip()}", normal))
+                else:
+                    story.append(Paragraph(line, normal))
 
         # ======================
         # ДИСКЛЕЙМЪР
@@ -2180,19 +2121,30 @@ def generate_medical_pdf(analysis_id):
             ["Лекар", "MED-AI Система"],
             ["Отдел", "Ендокринология"],
             ["Подпис", "__________________"],
-        ])
+        ], colWidths=[180, 280])
 
         signature.setStyle(TableStyle([
             ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
             ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#1e3a8a")),
             ("TEXTCOLOR", (0, 0), (0, -1), colors.white),
             ("FONTNAME", (0, 0), (-1, -1), font_name),
+            ("FONTSIZE", (0, 0), (-1, -1), 9),
         ]))
 
         story.append(signature)
+        
         # ======================
         # BUILD
         # ======================
+        def add_watermark(canvas_obj, doc_obj):
+            canvas_obj.saveState()
+            canvas_obj.setFont("Helvetica-Bold", 40)
+            canvas_obj.setFillColorRGB(0.85, 0.85, 0.85)
+            canvas_obj.translate(300, 400)
+            canvas_obj.rotate(45)
+            canvas_obj.drawCentredString(0, 0, "MED-AI SYSTEM")
+            canvas_obj.restoreState()
+
         doc.build(story, onFirstPage=add_watermark, onLaterPages=add_watermark)
         buffer.seek(0)
 
@@ -2210,22 +2162,7 @@ def generate_medical_pdf(analysis_id):
     finally:
         if cursor:
             cursor.close()
-        if conn:
-            conn.close()
 
-def add_watermark(canvas, doc):
-    canvas.saveState()
-
-    canvas.setFont("Helvetica-Bold", 40)
-    canvas.setFillColorRGB(0.85, 0.85, 0.85)  # light gray
-
-    canvas.translate(300, 400)
-    canvas.rotate(45)
-
-    canvas.drawCentredString(0, 0, "MED-AI SYSTEM")
-
-    canvas.restoreState()
-            
 @app.route('/doctor/save-edit/<int:analysis_id>', methods=["POST"])
 def save_edit(analysis_id):
 
@@ -2244,11 +2181,11 @@ def save_edit(analysis_id):
     conn.commit()
 
     cursor.close()
-    conn.close()
 
     return {"success": True}
 
 @app.route('/doctor/diagnosis-decision', methods=['POST'])
+@doctor_required
 def diagnosis_decision():
     conn = None
     cursor = None
@@ -2291,8 +2228,6 @@ def diagnosis_decision():
     finally:
         if cursor:
             cursor.close()
-        if conn:
-            conn.close()
 # =====================================================
 # RUN
 # =====================================================

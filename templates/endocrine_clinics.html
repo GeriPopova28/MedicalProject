@@ -21,7 +21,6 @@
                    placeholder="Търсене на клиника..."
                    onkeyup="searchClinic()">
 
-            <!-- FIX: dynamic cities instead of hardcoded -->
             <select id="cityFilter" onchange="filterByCity()">
                 <option value="all">Всички градове</option>
 
@@ -59,11 +58,6 @@
 
 </div>
 
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-
-<div id="calendar"></div>
-
 <!-- LOADING STATE -->
 <div id="loading" style="display:none; text-align:center; color:#94a3b8;">
     Зареждане на клиники...
@@ -84,9 +78,9 @@ document.addEventListener("DOMContentLoaded", function () {
         initMap();
     }
 
-    // optional UX safety
-    if (typeof loadClinics === "function") {
-        loadClinics();
+    // Коригирано име на функцията спрямоendocrine_clinics.js
+    if (typeof loadDoctors === "function") {
+        loadDoctors();
     }
 
 });

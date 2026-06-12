@@ -16,7 +16,6 @@ class MedicalAI:
         try:
             from tensorflow.keras.models import model_from_json
 
-            # LOAD MODEL ARCHITECTURE
             with open("model_architecture.json", "r") as f:
                 loaded_json = f.read()
 
@@ -25,7 +24,7 @@ class MedicalAI:
             # LOAD WEIGHTS
             self.model.load_weights("best_weights.h5")
 
-            print("✅ Model loaded successfully")
+            print("Model loaded successfully")
 
         except Exception as e:
             self.model = None
@@ -35,9 +34,7 @@ class MedicalAI:
         # MUST MATCH TRAINING CLASSES
         self.classes = ["Benign", "Malignant"]
 
-    # =====================================================
-    # QUIZ
-    # =====================================================
+
     def generate_quiz(self, lab_data, symptoms):
         if not isinstance(lab_data, dict):
             lab_data = {}
@@ -66,10 +63,7 @@ class MedicalAI:
             "options": ["Щитовидна жлеза", "Бял дроб", "Черен дроб"],
             "answer": 0
         }
-
-    # =====================================================
-    # MAIN PREDICTION
-    # =====================================================
+    
     def predict(self, img_array, lab_data=None, symptoms=None):
         if self.model is None:
             return ("Error", 0, "Model not loaded", None)
@@ -78,21 +72,18 @@ class MedicalAI:
             if img_array is None:
                 return ("Error", 0, "No image provided", None)
 
-            # IMAGE PREPROCESS
             img_rgb = cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB)
             img_resized = cv2.resize(img_rgb, (224, 224))
 
             img_input = np.expand_dims(img_resized, axis=0).astype("float32")
             img_input = preprocess_input(img_input)
 
-            # MODEL PREDICTION
             preds = self.model.predict(img_input, verbose=0)[0]
 
             base_confidence = float(np.max(preds) * 100)
             class_idx = int(np.argmax(preds))
             label = self.classes[class_idx]
 
-            # INFO MAP
             info = {
                 "Benign": {
                     "title": "Benign finding",
@@ -108,7 +99,6 @@ class MedicalAI:
             title = info[label]["title"]
             advice = info[label]["advice"]
 
-            # LAB DATA CORRELATION
             lab_score = 0
             if isinstance(lab_data, dict):
                 def safe_float(v):
@@ -129,7 +119,6 @@ class MedicalAI:
                 if ft4 is not None and ft4 > 22:
                     lab_score += 1
 
-            # SYMPTOMS CORRELATION
             symptom_score = 0
             if symptoms:
                 symptoms = [str(s).lower().strip() for s in symptoms]
@@ -140,11 +129,9 @@ class MedicalAI:
                 symptom_score += sum(1 for s in hypo if s in symptoms)
                 symptom_score += sum(1 for s in hyper if s in symptoms)
 
-            # FUSION LOGIC FOR CONFIDENCE SCORE
             confidence = base_confidence + (lab_score * 4) + (symptom_score * 2)
             confidence = min(max(confidence, 1), 99)
 
-            # OVERRIDE LOGIC BASED ON LABS/SYMPTOMS
             if label == "Malignant":
                 title = "High risk lesion detected"
                 advice += " Severe endocrine imbalance suspected."
@@ -155,7 +142,6 @@ class MedicalAI:
             if symptom_score >= 2:
                 advice += " Symptoms correlate with endocrine dysfunction."
 
-            # LOW CONFIDENCE UNCERTAINTY FILTER
             if base_confidence < 45:
                 return (
                     "Uncertain Scan",
@@ -164,7 +150,6 @@ class MedicalAI:
                     img_array
                 )
 
-            # HEATMAP GENERATION
             heatmap = self.generate_heatmap(img_array)
             overlay = self.overlay_heatmap(heatmap, img_array)
 
@@ -179,9 +164,7 @@ class MedicalAI:
             print("Prediction error:", e)
             return ("Error", 0, str(e), img_array)
 
-    # =====================================================
-    # EXPLANATION GENERATOR
-    # =====================================================
+
     def get_explanation(self, prediction, confidence, lab_data=None, symptoms=None):
         conf = float(confidence)
 
@@ -190,7 +173,6 @@ class MedicalAI:
         text += f"Primary finding: {prediction}\n"
         text += f"Model confidence: {conf:.1f}%\n"
 
-        # Коректно определяне на нивата на риск
         if "Critical" in prediction or conf >= 85:
             text += "Risk level: CRITICAL / HIGH\n\n"
             text += "Strong pathological patterns or major hormonal imbalances detected. Immediate clinical evaluation required.\n\n"
@@ -236,10 +218,7 @@ class MedicalAI:
 
         text += "Disclaimer: AI decision support tool only. Not a standalone diagnostic confirmation."
         return text
-
-    # =====================================================
-    # GRAD-CAM HEATMAP
-    # =====================================================
+    
     def generate_heatmap(self, img_array):
         try:
             if self.model is None:
@@ -250,12 +229,10 @@ class MedicalAI:
             img_input = preprocess_input(np.expand_dims(img_resized, axis=0).astype("float32"))
 
             last_conv_layer = None
-            # Намиране на конволюционния слой, работи стабилно и при вложени модели
             for layer in reversed(self.model.layers):
                 if hasattr(layer, 'output_shape') and len(layer.output_shape) == 4:
                     last_conv_layer = layer.name
                     break
-                # Алтернативна поддръжка за някои видове EfficientNet имплементации
                 if 'conv' in layer.name.lower() or 'top_activation' in layer.name.lower():
                     last_conv_layer = layer.name
                     break
@@ -294,9 +271,6 @@ class MedicalAI:
             print("Heatmap error:", e)
             return None
 
-    # =====================================================
-    # OVERLAY HEATMAP
-    # =====================================================
     def overlay_heatmap(self, heatmap, original_img):
         try:
             if heatmap is None:
