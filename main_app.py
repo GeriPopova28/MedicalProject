@@ -377,9 +377,7 @@ def patient_history():
 
     return render_template("patient_history.html")
 
-# =====================================================
-# PATIENT DATA API
-# =====================================================
+
 @app.route('/patient-data', methods=['GET'])
 def patient_data():
     if not is_logged_in():
@@ -391,16 +389,14 @@ def patient_data():
     cursor = conn.cursor(dictionary=True)
     
     try:
-        # 1. Намираме patient_id за текущия потребител
         cursor.execute("SELECT id FROM patients WHERE user_id = %s", (user_id,))
         patient = cursor.fetchone()
         
         if not patient:
-            return jsonify([])  # Все още няма анализи
+            return jsonify([])  
             
         patient_id = patient["id"]
         
-        # 2. Взимаме всички анализи, подредени от най-новия към най-стария
         cursor.execute("""
             SELECT
                 id,
@@ -417,7 +413,6 @@ def patient_data():
         
         results = cursor.fetchall()
         
-        # Важно: Сървърът трябва да върне created_at като ISO стринг за JavaScript
         for row in results:
             if row.get('created_at'):
                 row['created_at'] = row['created_at'].isoformat()
@@ -430,9 +425,6 @@ def patient_data():
     finally:
         cursor.close()
 
-# =====================================================
-# AI PREDICT
-# =====================================================
 @app.route('/doctor/patients-data')
 def doctor_patients_data():
 
@@ -458,7 +450,6 @@ def doctor_patients_data():
         print("PATIENTS DATA ERROR:", e)
         return jsonify([])
 
-# ================= DOCTOR PAGES =================
 
 @app.route('/doctor/patients')
 def doctor_patients():
@@ -548,10 +539,6 @@ def api_doctors():
 @app.route("/doctor/pending-analyses")
 def pending_analyses():
 
-    # =====================================================
-    # DOCTOR AUTH CHECK
-    # =====================================================
-
     if not is_logged_in():
 
         return jsonify({
@@ -566,10 +553,6 @@ def pending_analyses():
             "error": "Unauthorized"
         })
 
-    # =====================================================
-    # GET DOCTOR ID
-    # =====================================================
-
     doctor_id = session.get("doctor_id")
 
     if not doctor_id:
@@ -583,10 +566,6 @@ def pending_analyses():
 
         conn = get_db()
         cursor = conn.cursor(dictionary=True)
-
-        # =====================================================
-        # LOAD ANALYSES
-        # =====================================================
 
         cursor.execute("""
             SELECT
@@ -603,10 +582,6 @@ def pending_analyses():
         """, (doctor_id,))
 
         data = cursor.fetchall()
-
-        # =====================================================
-        # FORMAT DATES
-        # =====================================================
 
         for row in data:
 
@@ -632,10 +607,6 @@ def pending_analyses():
 @app.route("/doctor/update-analysis/<int:id>", methods=["POST"])
 def update_analysis(id):
 
-    # =====================================================
-    # DOCTOR CHECK
-    # =====================================================
-
     if not is_doctor():
 
         return jsonify({
@@ -648,10 +619,6 @@ def update_analysis(id):
         data = request.get_json()
 
         action = data.get("action")
-
-        # =====================================================
-        # VALID STATUS CHECK
-        # =====================================================
 
         allowed_actions = [
             "APPROVED",
@@ -670,10 +637,6 @@ def update_analysis(id):
         conn = get_db()
         cursor = conn.cursor()
 
-        # =====================================================
-        # CHECK IF ANALYSIS EXISTS
-        # =====================================================
-
         cursor.execute("""
             SELECT id
             FROM analysis_results
@@ -689,10 +652,6 @@ def update_analysis(id):
                 "success": False,
                 "error": "Analysis not found"
             })
-
-        # =====================================================
-        # UPDATE STATUS
-        # =====================================================
 
         cursor.execute("""
             UPDATE analysis_results
@@ -829,7 +788,6 @@ def predict():
 
     file.save(image_path)
 
-    # ================= IMAGE READ =================
     try:
         img = cv2.imdecode(
             np.frombuffer(open(image_path, "rb").read(), np.uint8),
@@ -844,7 +802,6 @@ def predict():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-    # ================= LAB =================
     def clean_float(val):
         if val is None or val == "":
             return 0.0
@@ -864,7 +821,6 @@ def predict():
 
     complain_text = (request.form.get("complain", "") or "").lower()
 
-    # ================= SYMPTOMS =================
     hypo_keywords = ["умор","отпаднал","слабост","напълня","тегло","студ","зиморнич","косопад","суха кожа","запек","депрес","сънлив"]
     hyper_keywords = ["нерв","тревож","сърцебиене","пулс","отслабна","слабеене","изпотя","топло","горещо","трепере","безсън"]
 
@@ -873,7 +829,6 @@ def predict():
     symptom_score += min(sum(k in complain_text for k in hyper_keywords) * 15, 50)
     symptom_score = min(symptom_score, 100)
 
-    # ================= DEFAULTS =================
     ai_class = "Unknown"
     ai_verdict = "Нормално"
     risk_level = "LOW"
@@ -953,7 +908,6 @@ def predict():
                 risk_level = "LOW"
                 advice = "Нормален резултат"
 
-            # ================= FIXED EXPLANATION =================
             explanation = f"""
             AI CLASS: {ai_class}
             Confidence: {ai_conf:.1f}%
@@ -966,7 +920,6 @@ def predict():
             Advice: {advice}
             """
 
-        # ================= DB UPDATE =================
         cursor.execute("""
             UPDATE patients
             SET age=%s,
@@ -1089,11 +1042,6 @@ def generate_ai_quiz():
         ft4 = float(lab_data.get("ft4", 0))
         mat = float(lab_data.get("mat", 0))
         tat = float(lab_data.get("tat", 0))
-
-        # ==========================================
-        # AI CLINICAL LOGIC
-        # ==========================================
-
         if tsh > 4.5 and ft4 < 12:
             diagnosis = "Hypothyroidism"
 
@@ -1102,11 +1050,6 @@ def generate_ai_quiz():
 
         else:
             diagnosis = "Normal"
-
-        # ==========================================
-        # QUESTION DATABASE
-        # ==========================================
-
         quiz_bank = [
 
             {
@@ -1300,10 +1243,6 @@ def generate_ai_quiz():
             }
 
         ]
-
-        # ==========================================
-        # FILTER QUESTIONS
-        # ==========================================
 
         available_questions = [
 
