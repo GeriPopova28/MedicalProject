@@ -34,11 +34,14 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 def doctor_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get("logged_in") or session.get("role") != "Doctor":
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.content_type == 'application/json':
-                return jsonify({"success": False, "error": "Нямате права за достъп"}), 403
-            return redirect(url_for('login_page'))
+
+        role = session.get("role", "").strip().lower()
+
+        if not session.get("logged_in") or role != "doctor":
+            return jsonify({"success": False, "error": "Нямате права за достъп"}), 403
+
         return f(*args, **kwargs)
+
     return decorated_function
 
 def validate_future_datetime(date, time):
@@ -1770,7 +1773,6 @@ def doctor_stats_data():
         if 'cursor' in locals(): cursor.close()
 
 @app.route('/doctor/generate-pdf/<int:analysis_id>', methods=["POST"])
-@doctor_required
 def generate_medical_pdf(analysis_id):
 
     import os
