@@ -25,7 +25,6 @@
     flex-direction: column;
 }
 
-/* HERO */
 .hero {
     text-align: center;
     padding: 120px 30px 60px;
@@ -45,7 +44,6 @@
     color: #cbd5e1;
 }
 
-/* GRID */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -80,7 +78,6 @@
     line-height: 1.6;
 }
 
-/* FOOTER */
 .footer {
     text-align: center;
     padding: 25px;
@@ -97,17 +94,14 @@
 <div class="doctor-page">
 
     
-    <!-- HERO -->
     <div class="hero">
         <h1>🩺 Doctor Dashboard</h1>
         <p>Добре дошъл, <b>{{ session.get('user') }}</b> • AI медицинска система за анализ и пациенти</p>
     </div>
 
-    <!-- CARDS -->
     <div class="grid">
     </div>
 
-    <!-- FOOTER -->
     <div class="footer">
         © 2026 MED-AI System • Doctor Panel
     </div>

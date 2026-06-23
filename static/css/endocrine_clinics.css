@@ -1,7 +1,3 @@
-/* =========================
-   DASHBOARD (POLISHED VERSION)
-========================= */
-
 .dashboard{
     padding:42px;
     min-height:100vh;
@@ -16,7 +12,6 @@
     letter-spacing:0.2px;
 }
 
-/* HEADER */
 .dash-header h1{
     font-size:32px;
     font-weight:700;
@@ -59,10 +54,6 @@
     will-change: transform;
 }
 
-/* =========================
-   CONTROLS (IMPROVED UX)
-========================= */
-
 .controls{
     display:flex;
     gap:12px;
@@ -93,7 +84,6 @@ select:focus{
     box-shadow:0 0 0 3px rgba(56,189,248,.15);
 }
 
-/* BUTTONS */
 button{
     padding:12px 18px;
     border:none;
@@ -113,23 +103,12 @@ button:hover{
     box-shadow:0 10px 20px rgba(37,99,235,.25);
 }
 
-/* =========================
-   MAP (CLEANER LOOK)
-========================= */
-
-/* =========================
-   CLINIC GRID
-========================= */
-
 .clinic-list{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
     gap:20px;
 }
 
-/* =========================
-   CLINIC CARD (MORE PREMIUM)
-========================= */
 
 .clinic-card{
     background:rgba(255,255,255,.03);
@@ -161,10 +140,6 @@ button:hover{
     font-size:14px;
 }
 
-/* =========================
-   DATE INPUT
-========================= */
-
 .clinic-card input[type="date"]{
     width:100%;
     padding:12px;
@@ -185,9 +160,6 @@ button:hover{
     outline:none;
 }
 
-/* =========================
-   SUCCESS BOX (IMPROVED)
-========================= */
 
 .success{
     display:none;
@@ -203,10 +175,6 @@ button:hover{
 
     font-weight:600;
 }
-
-/* =========================
-   SLOT BUTTONS (CLEANER)
-========================= */
 
 .slot-btn{
     margin:5px;
@@ -249,9 +217,6 @@ button:hover{
     box-shadow: 0 20px 40px rgba(0,0,0,.35);
 }
 
-/* =========================
-   MOBILE (IMPROVED)
-========================= */
 
 @media(max-width:900px){
 

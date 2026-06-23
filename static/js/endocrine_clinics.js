@@ -1,6 +1,3 @@
-/* =========================
-   MAP
-========================= */
 const map = L.map('map').setView([42.7,23.3],7);
 L.tileLayer(
 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -10,18 +7,14 @@ L.tileLayer(
 ).addTo(map);
 let clinics = [];
 let markers = [];
-/* =========================
-   TIME SLOTS
-========================= */
+
 const TIMES = [
     "09:00","10:00","11:00",
     "12:00","13:00","14:00",
     "15:00","16:00","17:00"
 ];
 let selectedSlots = {};
-/* =========================
-   AUTH
-========================= */
+
 async function checkAuth(){
     try{
         const res = await fetch("/me",{
@@ -36,9 +29,7 @@ async function checkAuth(){
     }
 }
 checkAuth();
-/* =========================
-   LOAD DOCTORS
-========================= */
+
 async function loadDoctors(){
     try{
         const res = await fetch(
@@ -57,9 +48,6 @@ async function loadDoctors(){
     }
 }
 loadDoctors();
-/* =========================
-   MAP MARKERS
-========================= */
 function loadMarkers(data){
     markers.forEach(m => map.removeLayer(m));
     markers = [];
@@ -79,9 +67,7 @@ function loadMarkers(data){
         markers.push(marker);
     });
 }
-/* =========================
-   RENDER CLINICS
-========================= */
+
 function renderClinics(data){
     const list =
     document.getElementById("clinicList");
@@ -117,9 +103,7 @@ function renderClinics(data){
         </div>
     `).join('');
 }
-/* =========================
-   RENDER SLOTS
-========================= */
+
 async function renderSlots(doctorId){
     const date =
     document.getElementById(`date-${doctorId}`).value;
@@ -165,16 +149,12 @@ async function renderSlots(doctorId){
         `<p>Грешка при зареждане.</p>`;
     }
 }
-/* =========================
-   SELECT SLOT
-========================= */
+
 function selectSlot(doctorId,time){
     selectedSlots[doctorId] = time;
     renderSlots(doctorId);
 }
-/* =========================
-   BOOK
-========================= */
+
 async function bookAppointment(doctorId){
     const date =
     document.getElementById(`date-${doctorId}`).value;
@@ -210,7 +190,7 @@ async function bookAppointment(doctorId){
             document.getElementById(`success-${doctorId}`);
             successBox.style.display = "block";
             successBox.innerText =
-            `✅ Успешно запазен час: ${selectedTime}`;
+            ` Успешно запазен час: ${selectedTime}`;
             delete selectedSlots[doctorId];
             await renderSlots(doctorId);
         }else{
@@ -221,11 +201,6 @@ async function bookAppointment(doctorId){
         alert("Сървърна грешка");
     }
 }
-/* =========================
-   SEARCH
-========================= */
-
-
 function searchClinic(){
 
 
@@ -252,9 +227,7 @@ function searchClinic(){
     renderClinics(filtered);
     loadMarkers(filtered);
 }
-/* =========================
-   FILTER CITY
-========================= */
+
 function filterByCity(){
     const city =
     document.getElementById(
@@ -270,9 +243,7 @@ function filterByCity(){
     renderClinics(filtered);
     loadMarkers(filtered);
 }
-/* =========================
-   FIND NEAREST
-========================= */
+
 function findNearest(){
     navigator.geolocation.getCurrentPosition(pos => {
         const lat = pos.coords.latitude;
@@ -306,9 +277,7 @@ function findNearest(){
         alert("Разрешете достъп до локация");
     });
 }
-/* =========================
-   DISTANCE
-========================= */
+
 function getDistance(a,b,c,d){
     const R = 6371;
     const dLat =

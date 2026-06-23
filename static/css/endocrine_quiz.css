@@ -1,4 +1,3 @@
-/* ===== BASE ===== */
 
 *{
     margin:0;
@@ -42,7 +41,6 @@ body{
     font-size:14px;
 }
 
-/* PROGRESS */
 .progress-container{
     width:100%;
     height:10px;
@@ -66,7 +64,6 @@ body{
     margin-bottom:25px;
 }
 
-/* QUIZ */
 .question-box{
     margin-bottom:25px;
 }
@@ -91,7 +88,6 @@ body{
     border:2px solid #38bdf8;
 }
 
-/* BUTTONS */
 button{
     width:100%;
     padding:14px;
@@ -111,7 +107,6 @@ button{
     color:black;
 }
 
-/* RESULT */
 .result-box{
     margin-top:20px;
     padding:18px;
@@ -131,7 +126,6 @@ button{
     color:#ef4444;
 }
 
-/* LOADER */
 #loader{
     text-align:center;
     margin:20px 0;
@@ -139,7 +133,6 @@ button{
     display:none;
 }
 
-/* FINAL */
 .final-score{
     font-size:60px;
     color:#38bdf8;

@@ -768,6 +768,7 @@ def predict():
 
     patient_id = patient_row[0]
 
+    # ================= FILE =================
     file = request.files.get('file')
     if not file:
         return jsonify({"success": False, "error": "No file uploaded"}), 400
@@ -1253,16 +1254,35 @@ def generate_ai_quiz():
         quiz = random.choice(available_questions)
 
         used_questions.add(quiz["question"])
+
+        # ==========================================
+        # RANDOMIZE ANSWERS
+        # ==========================================
+
         options = quiz["options"].copy()
+
         random.shuffle(options)
+
         answer_index = options.index(quiz["correct"])
+
+        # ==========================================
+        # RESPONSE
+        # ==========================================
+
         return jsonify({
+
             "success": True,
+
             "diagnosis": diagnosis,
+
             "quiz": {
+
                 "question": quiz["question"],
+
                 "options": options,
+
                 "answer": answer_index
+
             }
 
         })
@@ -1292,6 +1312,9 @@ def book_appointment():
     cursor = None
 
     try:
+        # =========================
+        # AUTH CHECK
+        # =========================
         if "user_id" not in session:
             return jsonify({"success": False, "error": "Not logged in"}), 401
 
@@ -1303,6 +1326,10 @@ def book_appointment():
 
         if not doctor_id or not date or not time:
             return jsonify({"success": False, "error": "Missing data"}), 400
+
+        # =========================
+        # PARSE DATETIME
+        # =========================
         try:
             selected_dt = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
         except ValueError:
@@ -1310,11 +1337,19 @@ def book_appointment():
                 "success": False,
                 "error": "Invalid date/time format"
             }), 400
+
+        # =========================
+        # BLOCK PAST
+        # =========================
         if selected_dt <= datetime.now():
             return jsonify({
                 "success": False,
                 "error": "Няма как да запазите час в миналотом"
             }), 400
+
+        # =========================
+        # BLOCK WEEKENDS
+        # =========================
         weekday = selected_dt.weekday()
         if weekday == 5 or weekday == 6:
             return jsonify({
@@ -1322,8 +1357,15 @@ def book_appointment():
                 "error": "Събота и неделя не са позволени за записване"
             }), 400
 
+        # =========================
+        # DB CONNECTION
+        # =========================
         conn = get_db()
         cursor = conn.cursor(dictionary=True)
+
+        # =========================
+        # GET PATIENT ID
+        # =========================
         cursor.execute("""
             SELECT id FROM patients WHERE user_id = %s
         """, (session["user_id"],))
@@ -1337,6 +1379,10 @@ def book_appointment():
             }), 400
 
         patient_id = patient["id"]
+
+        # =========================
+        # CHECK DUPLICATE SLOT
+        # =========================
         cursor.execute("""
             SELECT id FROM appointments
             WHERE doctor_id=%s AND date=%s AND time=%s
@@ -1347,6 +1393,10 @@ def book_appointment():
                 "success": False,
                 "error": "Slot already booked"
             }), 409
+
+        # =========================
+        # INSERT APPOINTMENT
+        # =========================
         cursor.execute("""
             INSERT INTO appointments (doctor_id, patient_id, date, time)
             VALUES (%s, %s, %s, %s)
@@ -1389,6 +1439,7 @@ def doctor_availability(doctor_id, date):
         for r in rows:
             t = r["time"]
 
+            # SAFE conversion (fix crash)
             if hasattr(t, "strftime"):
                 booked.append(t.strftime("%H:%M"))
             else:
@@ -1484,6 +1535,10 @@ def generated_slots(doctor_id, date):
             pass
 
 from flask import request, jsonify
+
+# -------------------------
+# HELPERS
+# -------------------------
 def safe_float(value):
     try:
         if value is None or value == "":
@@ -1503,6 +1558,10 @@ def run_analysis():
     try:
         if not is_logged_in():
             return jsonify({"error": "Unauthorized"}), 401
+
+        # =========================
+        # SAFE HELPERS (local, no dependencies)
+        # =========================
         def safe_float(value):
             try:
                 if value is None or value == "":
@@ -1513,6 +1572,10 @@ def run_analysis():
 
         def clamp(x, min_v=0, max_v=1):
             return max(min_v, min(x, max_v))
+
+        # =========================
+        # INPUTS
+        # =========================
         file = request.files.get("file")
 
         complain = (request.form.get("complain") or "").lower()
@@ -1521,9 +1584,17 @@ def run_analysis():
         ft4 = safe_float(request.form.get("ft4"))
         mat = safe_float(request.form.get("mat"))
         tat = safe_float(request.form.get("tat"))
+
+        # =========================
+        # SCORES
+        # =========================
         lab_score = 0.0
         symptom_score = 0.0
         image_score = 0.0
+
+        # =========================
+        # LAB SCORE (robust)
+        # =========================
         if tsh is not None:
             if tsh > 4.5:
                 lab_score += 0.4
@@ -1545,6 +1616,10 @@ def run_analysis():
             lab_score += 0.2
 
         lab_score = clamp(lab_score, 0, 1)
+
+        # =========================
+        # SYMPTOMS ENGINE
+        # =========================
         symptoms_map = {
             "fatigue": 0.15,
             "tired": 0.15,
@@ -1561,15 +1636,29 @@ def run_analysis():
                 symptom_score += v
 
         symptom_score = clamp(symptom_score, 0, 1)
+
+        # =========================
+        # IMAGE SCORE
+        # =========================
         if file and file.filename != "":
             image_score = 0.25
+
+        # =========================
+        # FINAL FUSION MODEL
+        # =========================
         score = (
             lab_score * 0.5 +
             symptom_score * 0.3 +
             image_score * 0.2
         )
+
         score = clamp(score, 0, 1)
+
         confidence = round(score * 100, 2)
+
+        # =========================
+        # EXPLAINABLE AI BLOCK (WHY)
+        # =========================
         explain = {
             "why_high_risk": {
                 "lab_contribution": round(lab_score * 0.5, 2),
@@ -1585,6 +1674,10 @@ def run_analysis():
                 )[0]
             }
         }
+
+        # =========================
+        # CLINICAL DECISION
+        # =========================
         if score < 0.30:
             risk = "LOW"
             advice = "Normal findings. Routine follow-up recommended."
@@ -1627,7 +1720,7 @@ def doctor_stats_data():
     role = session.get("role")
 
     if not user_id:
-        return jsonify([]), 200 
+        return jsonify([]), 200   # важно: array, не object
 
     try:
         conn = get_db()
@@ -1697,6 +1790,10 @@ def generate_medical_pdf(analysis_id):
     try:
         conn = get_db()
         cursor = conn.cursor(dictionary=True)
+
+        # ======================
+        # GET DATA
+        # ======================
         cursor.execute("""
             SELECT 
                 r.*, 
@@ -1716,6 +1813,10 @@ def generate_medical_pdf(analysis_id):
 
         if not result:
             return "No record found", 404
+
+        # ======================
+        # GET EDITED EXPLANATION
+        # ======================
         data = request.get_json(silent=True) or {}
         edited_explanation = data.get("explanation")
 
@@ -1729,6 +1830,10 @@ def generate_medical_pdf(analysis_id):
 
         final_explanation = edited_explanation or result.get("explanation") or "-"
         final_explanation = str(final_explanation)
+
+        # ======================
+        # PDF SETUP
+        # ======================
         buffer = io.BytesIO()
 
         font_path = r"C:\Windows\Fonts\arial.ttf"
@@ -1786,7 +1891,13 @@ def generate_medical_pdf(analysis_id):
         )
 
         story = []
+
+        # ======================
+        # HEADER
+        # ======================
+
         logo_path = "static/logo.png"
+
         header_text = [
             Paragraph("УНИВЕРСИТЕТСКА БОЛНИЦА МЕДИЦИНСКИ ЦЕНТЪР", title_style),
             Paragraph("Отдел Ендoкриnология • AI Клиничен отчет", normal),
@@ -1798,6 +1909,7 @@ def generate_medical_pdf(analysis_id):
         else:
             logo = ""
 
+        # TABLE HEADER (logo + text)
         header_table = Table(
         [[logo, header_text]],
         colWidths=[80, 420]
@@ -1811,6 +1923,10 @@ def generate_medical_pdf(analysis_id):
 
         story.append(header_table)
         story.append(Spacer(1, 10))
+
+        # ======================
+        # ПАЦИЕНТСКА ИНФОРМАЦИЯ
+        # ======================
         patient_info = [
         ["Пациент", safe(result.get('patient_name'))],
         ["Номер на отчет", safe(result.get('id'))],
@@ -1829,16 +1945,28 @@ def generate_medical_pdf(analysis_id):
 
         story.append(table)
         story.append(Spacer(1, 15))
+
+        # ======================
+        # ЕХОГРАФИЯ
+        # ======================
         image_path = result.get("image_path")
 
         if image_path and os.path.exists(image_path):
             story.append(Spacer(1, 10))
             story.append(Paragraph("УЛТРАЗВУКОВО ИЗОБРАЖЕНИЕ", section))
             story.append(Image(image_path, width=250, height=250))
+
+        # ======================
+        # ДИАГНОЗА
+        # ======================
         story.append(Paragraph("КЛИНИЧНА ДИАГНОЗA", section))
         story.append(Paragraph(f"AI: {safe(result.get('prediction'))}", normal))
         story.append(Paragraph(f"Точност: {safe(result.get('confidence', 0))}%", normal))
         story.append(Paragraph(f"Риск: {safe(result.get('risk_level'))}", normal))
+
+        # ======================
+        # ОЦЕНКА НА РИСКА
+        # ======================
         story.append(Spacer(1, 10))
         story.append(Paragraph("ОЦЕНКА НА РИСКА", section))
 
@@ -1860,6 +1988,10 @@ def generate_medical_pdf(analysis_id):
         ]))
 
         story.append(risk_table)
+
+        # ======================
+        # ПАЦИЕНТСКИ ФАКТОРИ
+        # ======================
         story.append(Spacer(1, 10))
         story.append(Paragraph("РИСКОВИ ФАКТОРИ НА ПАЦИЕНТА", section))
 
@@ -1880,9 +2012,17 @@ def generate_medical_pdf(analysis_id):
         ]))
 
         story.append(patient_table)
+
+        # ======================
+        # ПРЕПОРЪКА
+        # ======================
         story.append(Spacer(1, 10))
         story.append(Paragraph("МЕДИЦИНСКА ПРЕПОРЪКА", section))
         story.append(Paragraph(safe(result.get('advice')), normal))
+
+        # ======================
+        # КЛИНИЧЕН АНАЛИЗ
+        # ======================
         story.append(Spacer(1, 10))
         story.append(Paragraph("КЛИНИЧЕН АНАЛИЗ", section))
 
@@ -1894,11 +2034,19 @@ def generate_medical_pdf(analysis_id):
                     story.append(Paragraph(f"<b>{parts[0].strip()}</b>: {parts[1].strip()}", normal))
                 else:
                     story.append(Paragraph(line, normal))
+
+        # ======================
+        # ДИСКЛЕЙМЪР
+        # ======================
         story.append(Spacer(1, 10))
         story.append(Paragraph(
             "⚠ Този отчет е генериран с помощта на изкуствен интелект и е проверен от лекар.",
             small
         ))
+
+        # ======================
+        # ПОДПИС
+        # ======================
         story.append(Spacer(1, 15))
 
         signature = Table([
@@ -1916,6 +2064,10 @@ def generate_medical_pdf(analysis_id):
         ]))
 
         story.append(signature)
+        
+        # ======================
+        # BUILD
+        # ======================
         def add_watermark(canvas_obj, doc_obj):
             canvas_obj.saveState()
             canvas_obj.setFont("Helvetica-Bold", 40)
@@ -2008,6 +2160,9 @@ def diagnosis_decision():
     finally:
         if cursor:
             cursor.close()
+# =====================================================
+# RUN
+# =====================================================
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

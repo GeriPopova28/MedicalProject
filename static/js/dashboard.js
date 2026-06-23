@@ -22,7 +22,6 @@ function initDashboard(data) {
     filterAndRender();
 }
 
-/* ================= FILTER ================= */
 
 function filterAndRender() {
     const searchQuery =
@@ -43,13 +42,11 @@ function filterAndRender() {
     renderTable(filtered);
 }
 
-/* ================= STATUS ================= */
 
 function getStatus(p) {
     return p?.status || p?.diagnosis || "Normal";
 }
 
-/* ================= COUNTERS ================= */
 
 function updateCounters(data) {
     let c = 0, s = 0, n = 0;
@@ -73,7 +70,6 @@ function setText(id, value) {
     if (el) el.innerText = value;
 }
 
-/* ================= TABLE ================= */
 
 function renderTable(data) {
     const tbody = document.getElementById("dashboardHistoryBody");
@@ -94,7 +90,6 @@ function renderTable(data) {
     }).join("");
 }
 
-/* ================= AUTO REFRESH ================= */
 
 function startAutoRefresh() {
     setInterval(async () => {

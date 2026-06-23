@@ -1,8 +1,3 @@
-    /* =====================================================
-   AI MEDICAL DASHBOARD — FULL PREMIUM CSS
-===================================================== */
-
-
 .dashboard {
     padding: 40px;
     color: #f1f5f9;
@@ -18,13 +13,6 @@
 
     background-attachment: fixed;
 }
-
-
-/* =====================================================
-   HEADER
-===================================================== */
-
-
 .dash-header {
     margin-bottom: 30px;
 }
@@ -57,13 +45,6 @@
     font-size: 14px;
     margin-top: 0;
 }
-
-
-/* =====================================================
-   CONTROLS
-===================================================== */
-
-
 .controls {
     display: flex;
     justify-content: space-between;
@@ -72,13 +53,6 @@
     flex-wrap: wrap;
     margin-bottom: 25px;
 }
-
-
-/* =====================================================
-   SEARCH
-===================================================== */
-
-
 .search-wrapper {
     position: relative;
     width: 350px;
@@ -98,25 +72,13 @@
 .search-input {
     width: 100%;
     padding: 14px 16px 14px 45px;
-
-
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,0.08);
-
-
     background: rgba(255,255,255,0.04);
-
-
     color: white;
     font-size: 14px;
-
-
     outline: none;
-
-
     transition: all 0.25s ease;
-
-
     backdrop-filter: blur(10px);
 }
 
@@ -128,23 +90,11 @@
 
 .search-input:focus {
     border-color: #60a5fa;
-
-
     background: rgba(255,255,255,0.07);
-
-
     box-shadow:
         0 0 20px rgba(59,130,246,0.25);
-
-
     transform: scale(1.02);
 }
-
-
-/* =====================================================
-   BUTTONS
-===================================================== */
-
 
 .btn-group {
     display: flex;
@@ -161,81 +111,36 @@ button {
 
 .btn-action {
     background: rgba(255,255,255,0.05);
-
-
     border: 1px solid rgba(255,255,255,0.08);
-
-
     color: #e2e8f0;
-
-
     padding: 12px 18px;
-
-
     border-radius: 14px;
-
-
     font-weight: 600;
     font-size: 14px;
-
-
     display: flex;
     align-items: center;
     gap: 8px;
-
-
     backdrop-filter: blur(10px);
 }
 
 
 .btn-action:hover {
     background: rgba(37,99,235,0.22);
-
-
     border-color: #60a5fa;
-
-
     color: white;
-
-
     transform: translateY(-2px);
-
-
     box-shadow:
         0 10px 25px rgba(37,99,235,0.25);
 }
-
-
-/* =====================================================
-   TABLE WRAPPER
-===================================================== */
-
-
 .table-wrapper {
     background: rgba(255,255,255,0.04);
-
-
     border: 1px solid rgba(255,255,255,0.08);
-
-
     border-radius: 24px;
-
-
     overflow: hidden;
-
-
     backdrop-filter: blur(16px);
-
-
     box-shadow:
         0 25px 50px rgba(0,0,0,0.35);
 }
-
-
-/* =====================================================
-   TABLE
-===================================================== */
-
 
 table {
     width: 100%;
@@ -279,12 +184,6 @@ tr:hover td {
     background: rgba(59,130,246,0.04);
 }
 
-
-/* =====================================================
-   CONFIDENCE BAR
-===================================================== */
-
-
 .confidence-wrapper {
     display: flex;
     flex-direction: column;
@@ -309,11 +208,6 @@ tr:hover td {
     box-shadow:
         0 0 12px rgba(59,130,246,0.4);
 }
-
-
-/* =====================================================
-   RISK BADGES
-===================================================== */
 
 
 .badge-risk {
@@ -355,13 +249,6 @@ tr:hover td {
     box-shadow:
         0 0 14px rgba(16,185,129,0.35);
 }
-
-
-/* =====================================================
-   OPEN BUTTON
-===================================================== */
-
-
 .btn-toggle-report {
     background:
         linear-gradient(to right, #2563eb, #3b82f6);
@@ -382,12 +269,6 @@ tr:hover td {
     box-shadow:
         0 10px 20px rgba(37,99,235,0.35);
 }
-
-
-/* =====================================================
-   REPORT ROW
-===================================================== */
-
 
 .report-row {
     background: rgba(15,23,42,0.45);
@@ -419,9 +300,6 @@ tr:hover td {
     line-height: 1.7;
     font-size: 14px;
 }
-/* =====================================================
-   CONFIRM / REJECT BUTTONS
-===================================================== */
 .btn-confirm,
 .btn-reject {
     border: none;
@@ -452,11 +330,6 @@ tr:hover td {
     box-shadow:
         0 10px 20px rgba(239,68,68,0.35);
 }
-/* =====================================================
-   ANIMATION
-===================================================== */
-
-
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -467,9 +340,6 @@ tr:hover td {
         transform: translateY(0);
     }
 }
-/* =====================================================
-   CUSTOM SCROLLBAR
-===================================================== */
 ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -508,9 +378,6 @@ tr:hover td {
 .btn-pdf:active {
     transform: scale(0.98);
 }
-/* =====================================================
-   RESPONSIVE
-===================================================== */
 @media (max-width: 950px) {
     .dashboard {
         padding: 20px;
